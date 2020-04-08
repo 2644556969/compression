@@ -22,6 +22,7 @@ import argparse
 import os.path
 from tensorflow.core.protobuf import rewriter_config_pb2
 from tensorflow.python.tools import freeze_graph
+import h5py
 
 
 def print_nodes(graph_def=None):
@@ -52,8 +53,44 @@ def load_mnist_data(start_batch=0, batch_size=10000):
 
     x_test = x_test[start_batch:start_batch + batch_size]
     y_test = y_test[start_batch:start_batch + batch_size]
-
     return (x_train, y_train, x_test, y_test)
+
+
+#Gets features from MNIST and sets y_train, y_test as the most accurate logit model so far.
+#
+#
+def load_mnist_logit_data(start_batch=0, batch_size=10000):
+
+    mnist = tf.keras.datasets.mnist
+    (x_train, y_train), (x_test, y_test) = mnist.load_data()
+    y_train = tf.compat.v1.keras.utils.to_categorical(y_train, num_classes=10)
+    y_test = tf.compat.v1.keras.utils.to_categorical(y_test, num_classes=10)
+    x_train = np.expand_dims(x_train, axis=-1)
+    x_test = np.expand_dims(x_test, axis=-1)
+
+    x_train = x_train.astype("float32")
+    x_test = x_test.astype("float32")
+    x_train /= 255.0
+    x_test /= 255.0
+
+    x_test = x_test[start_batch:start_batch + batch_size]
+    y_test = y_test[start_batch:start_batch + batch_size]
+
+    ##Adding logits from convolutional MNIST model  
+    y_train_label = y_train 
+    y_test_label = y_test 
+
+    h5f = h5py.File('logit_out_train.h5' , 'r')
+    y_train = h5f2['dataset_1'][:]
+    h5f.close()
+
+    h5f2 = h5py.File('logit_out_test.h5' , 'r')
+    y_test = h5f2['dataset_1'][:]
+    h5f2.close()
+
+
+
+    return (x_train, y_train, y_train_label, x_test, y_test, y_test_label)
 
 
 def load_pb_file(filename):
