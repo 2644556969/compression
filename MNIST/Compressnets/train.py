@@ -100,8 +100,50 @@ def squash_layers(cryptonets_model, sess):
             fc2_weights)
 
 
+##shallow neural network with a variable number of layers 
+def cryptonets_model_no_conv(input, layer_list):
+
+    def square_activation(x):
+        return x * x
+
+    y = Flatten()(input)
+
+    dense_num = 0 
+    for layer_name, param in layer_list:
+        if layer_name == "dense":
+            name = "dense_" + str(dense_num)
+            dense_num = dense_num + 1
+            y = Dense(param, use_bias=True, name=name)(y) 
+        else if layer_name == "activation":
+            if param == "square":
+                y = Activation(square_activation)(y)
+    return y 
+
+
+#creates a hyperparameter search over valid architrectures 
+def generate_architecture(poly_modulus, bit_precision=24, security_level=128): 
+    ##TODO## 
+
+def loss(labels, logits):
+    return keras.losses.categorical_crossentropy(
+        labels, logits, from_logits=True)
+
+def MSEloss(logit_labels, logits): 
+    return 
+
+def logit_accuracy(y_true, y_pred_logit):
+
+    y_test_label = np.argmax(y_true, 1)
+    y_pred = np.argmax(y_pred_logit, 1)
+    correct_prediction = np.equal(y_pred, y_test_label)
+    test_accuracy = np.mean(correct_prediction)
+
+    return test_accuracy 
+
+
+
 def main(FLAGS):
-    (x_train, y_train, x_test, y_test) = mnist_util.load_mnist_data()
+    (x_train, y_train, y_train_label, x_test, y_test, y_test_label) = mnist_util.load_mnist_logit_data()
 
     x = Input(
         shape=(
@@ -110,52 +152,56 @@ def main(FLAGS):
             1,
         ), name="input")
 
-    y = model.cryptonets_model(x)
-    cryptonets_model = Model(inputs=x, outputs=y)
-    print(cryptonets_model.summary())
+    #generate valid architectures for a given security level and fixed layer level:
+    #architectures = generate_architecture(4096) TODO
 
-    def loss(labels, logits):
-        return keras.losses.categorical_crossentropy(
-            labels, logits, from_logits=True)
+    architectures = [[("dense", 20), ("dense", 100), ("activation", "square"), ("dense", 10)]]
 
-    optimizer = SGD(learning_rate=0.008, momentum=0.9)
-    cryptonets_model.compile(
-        optimizer=optimizer, loss=loss, metrics=["accuracy"])
+    for layer_list in architectures: 
+        y = cryptonets_model_no_conv(x, layer_list)
+        cryptonets_model = Model(inputs=x, outputs=y)
+        print(cryptonets_model.summary())
 
-    cryptonets_model.fit(
-        x_train,
-        y_train,
-        epochs=FLAGS.epochs,
-        batch_size=FLAGS.batch_size,
-        validation_data=(x_test, y_test),
-        verbose=1)
 
-    test_loss, test_acc = cryptonets_model.evaluate(x_test, y_test, verbose=1)
-    print("Test accuracy:", test_acc)
+
+        optimizer = SGD(learning_rate=0.008, momentum=0.9)
+        cryptonets_model.compile(
+            optimizer=optimizer, loss='mean_squared_error', metrics=[logit_accuracy])
+
+        cryptonets_model.fit(
+            x_train,
+            y_train,
+            epochs=FLAGS.epochs,
+            batch_size=FLAGS.batch_size,
+            validation_data=(x_test, y_test),
+            verbose=1)
+
+        test_loss, test_acc = cryptonets_model.evaluate(x_test, y_test_label, verbose=1) #should this be y-test? No, evaluating against y_Test_label 
+        print("Test accuracy:", test_acc)
 
     # Squash weights and save model
-    weights = squash_layers(cryptonets_model,
-                            tf.compat.v1.keras.backend.get_session())
-    (conv1_weights, squashed_weights, fc1_weights, fc2_weights) = weights[0:4]
+    # weights = squash_layers(cryptonets_model,
+    #                         tf.compat.v1.keras.backend.get_session())
+    # (conv1_weights, squashed_weights, fc1_weights, fc2_weights) = weights[0:4]
 
-    tf.reset_default_graph()
-    sess = tf.compat.v1.Session()
+    # tf.reset_default_graph()
+    # sess = tf.compat.v1.Session()
 
-    x = Input(
-        shape=(
-            28,
-            28,
-            1,
-        ), name="input")
-    y = model.cryptonets_model_squashed(x, conv1_weights, squashed_weights,
-                                        fc2_weights)
-    sess.run(tf.compat.v1.global_variables_initializer())
-    mnist_util.save_model(
-        sess,
-        ["output/BiasAdd"],
-        "./models",
-        "cryptonets",
-    )
+    # x = Input(
+    #     shape=(
+    #         28,
+    #         28,
+    #         1,
+    #     ), name="input")
+    # y = model.cryptonets_model_squashed(x, conv1_weights, squashed_weights,
+    #                                     fc2_weights)
+    # sess.run(tf.compat.v1.global_variables_initializer())
+    # mnist_util.save_model(
+    #     sess,
+    #     ["output/BiasAdd"],
+    #     "./models",
+    #     "cryptonets",
+    # )
 
 
 if __name__ == "__main__":
