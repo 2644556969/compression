@@ -21,7 +21,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.python.tools import freeze_graph
-import model
+import model 
 
 # Add parent directory to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -99,6 +99,91 @@ def squash_layers(cryptonets_model, sess):
     return (conv1_weights, (squashed_weights, squashed_bias), fc1_weights,
             fc2_weights)
 
+# Squash connected linear layers and return squashed weights
+#right now doesn't support convolutional layer squashing, only squashing of linear layers
+#assume only dense and activation layers in layer list  
+def squash_layers_variable(cryptonets_model, sess, layer_list):
+    layers = cryptonets_model.layers
+    layer_names = [layer.name for layer in layers]
+    conv1_weights = layers[layer_names.index('conv2d_1')].get_weights()
+    conv2_weights = layers[layer_names.index('conv2d_2')].get_weights()
+    fc1_weights = layers[layer_names.index('fc_1')].get_weights()
+    fc2_weights = layers[layer_names.index('fc_2')].get_weights()
+
+    weights = [] 
+    compressed_layer_list = [] 
+    curr_input = 784 
+    dense_processed = 0 
+
+    i = 0 
+    while i < len(layer_list):
+        if layer_list[i][0] == "activation":
+            compressed_layer_list.append(layer_list[i]) 
+            i += 1 
+        else: 
+            end = i + 1 
+            while end < len(layer_list) and layer_list[end][0] != "activation":
+                end += 1 
+            #layers to compress are from i to j, excluding j 
+            #if only one layer between activation 
+            if end - i == 1: 
+                name = "dense_" + str(dense_processed)
+                layer_info = layers[layer_names.index(name)]
+                curr_layer_weights = layer_info.get_weights() 
+                weights.append(curr_layer_weights) 
+                compressed_layer_list.append(("dense", layer_info.output_shape[1]))
+
+                curr_input = layer_info.output_shape[1]
+                dense_processed += 1 
+
+            else: 
+                #squash dense layers 
+                orig_input = curr_input 
+                y = Input(shape=(curr_input,), name = "squashed_input")
+                for j in range(i, end): 
+                    name = "dense_" + str(dense_processed) 
+                    layer_info = layers[layer_names.index(name)]
+                    layer_weights = layer_info.get_weights() 
+                    y = Dense(layer_info.output_shape[1], 
+                        use_bias = True, 
+                        name=name,  #is this improtant? 
+                        kernel_initializer=tf.compat.v1.constant_initializer(layer_weights[0]),
+                        bias_initializer=tf.compat.v1.constant_initializer(layer_weights[1]))(y)
+                    
+                    curr_input = layer_info.output_shape[1] 
+                    dense_processed += 1 
+
+                #compress this multi-layer dense model into one layer 
+
+                # Pass 0 to get bias
+                squashed_bias = y.eval(
+                    session=sess,
+                    feed_dict={
+                        "squashed_input:0": np.zeros((1, orig_input))
+                    })
+                squashed_bias_plus_weights = y.eval(
+                    session=sess, feed_dict={
+                        "squashed_input:0": np.eye(orig_input)
+                    })
+                squashed_weights = squashed_bias_plus_weights - squashed_bias
+                print("squashed layers")
+
+                #sanity check 
+                x_in = np.random.rand(100, 14 * 14 * 5)
+                network_out = y.eval(session=sess, feed_dict={"squashed_input:0": x_in})
+                linear_out = x_in.dot(squashed_weights) + squashed_bias
+                assert np.max(np.abs(linear_out - network_out)) < 1e-3
+
+
+                #add layer 
+                compressed_layer_list.append(("dense", curr_input))
+                weights.append((squashed_weights, squashed_bias))
+
+            i = end 
+
+    return weights, compressed_layer_list 
+
+
 
 ##shallow neural network with a variable number of layers 
 def cryptonets_model_no_conv(input, layer_list):
@@ -155,14 +240,14 @@ def main(FLAGS):
     #generate valid architectures for a given security level and fixed layer level:
     #architectures = generate_architecture(4096) TODO
 
-    architectures = [[("dense", 20), ("dense", 100), ("activation", "square"), ("dense", 10)]]
+    architectures = [[("dense", 40), ("dense", 800), ("activation", "square"), ("dense", 10)],
+    [("dense", 800), ("dense", 800), ("dense", 10)]]
 
+    accuracies = [] 
     for layer_list in architectures: 
         y = cryptonets_model_no_conv(x, layer_list)
         cryptonets_model = Model(inputs=x, outputs=y)
         print(cryptonets_model.summary())
-
-
 
         optimizer = SGD(learning_rate=0.008, momentum=0.9)
         cryptonets_model.compile(
@@ -178,14 +263,42 @@ def main(FLAGS):
 
         test_loss, test_acc = cryptonets_model.evaluate(x_test, y_test_label, verbose=1) #should this be y-test? No, evaluating against y_Test_label 
         print("Test accuracy:", test_acc)
+        accuracies.append(test_acc)
+
+        #reset graph 
+        tf.reset_default_graph()
+        sess = tf.compat.v1.Session()
+
+    best_model = np.argmax(accuracies) 
+    layer_list = architectures[best_model]
+
+    y = cryptonets_model_no_conv(x, layer_list)
+    cryptonets_model = Model(inputs=x, outputs=y)
+    print(cryptonets_model.summary())
+
+    optimizer = SGD(learning_rate=0.008, momentum=0.9)
+    cryptonets_model.compile(
+        optimizer=optimizer, loss='mean_squared_error', metrics=[logit_accuracy])
+
+    cryptonets_model.fit(
+        x_train,
+        y_train,
+        epochs=FLAGS.epochs,
+        batch_size=FLAGS.batch_size,
+        validation_data=(x_test, y_test),
+        verbose=1)
+
+    test_loss, test_acc = cryptonets_model.evaluate(x_test, y_test_label, verbose=1) #should this be y-test? No, evaluating against y_Test_label 
+    print("Test accuracy:", test_acc)
+    accuracies.append(test_acc)
 
     # Squash weights and save model
-    # weights = squash_layers(cryptonets_model,
-    #                         tf.compat.v1.keras.backend.get_session())
-    # (conv1_weights, squashed_weights, fc1_weights, fc2_weights) = weights[0:4]
+    weights = squash_layers_variable(cryptonets_model,
+                             tf.compat.v1.keras.backend.get_session())
+    (conv1_weights, squashed_weights, fc1_weights, fc2_weights) = weights[0:4]
 
-    # tf.reset_default_graph()
-    # sess = tf.compat.v1.Session()
+    tf.reset_default_graph()
+    sess = tf.compat.v1.Session()
 
     # x = Input(
     #     shape=(
