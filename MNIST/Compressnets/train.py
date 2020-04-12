@@ -242,6 +242,8 @@ def loss(labels, logits):
         labels, logits, from_logits=True)
 
 def logit_accuracy(y_true, y_pred_logit):
+    print(y_true)
+    print(y_pred_logit)
 
     y_test_label = np.argmax(y_true, 1)
     y_pred = np.argmax(y_pred_logit, 1)
