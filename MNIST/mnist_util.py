@@ -81,7 +81,7 @@ def load_mnist_logit_data(start_batch=0, batch_size=10000):
     y_test_label = y_test 
 
     h5f = h5py.File('logit_out_train.h5' , 'r')
-    y_train = h5f2['dataset_1'][:]
+    y_train = h5f['dataset_1'][:]
     h5f.close()
 
     h5f2 = h5py.File('logit_out_test.h5' , 'r')
