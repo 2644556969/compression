@@ -258,12 +258,6 @@ def main(FLAGS):
 
     print(x_train[0])
     print(y_train[0])
-    x = Input(
-        shape=(
-            28,
-            28,
-            1,
-        ), name="input")
 
     #generate valid architectures for a given security level and fixed layer level:
     #architectures = generate_architecture(4096) TODO
@@ -275,12 +269,18 @@ def main(FLAGS):
     print("Architectures to test:")
     for layer_list in architectures:
         print(layer_list)
-    
+
 
 
     
     accuracies = [] 
     for layer_list in architectures: 
+        x = Input(
+            shape=(
+                28,
+                28,
+                1,
+            ), name="input")
         y = cryptonets_model_no_conv(x, layer_list)
         cryptonets_model = Model(inputs=x, outputs=y)
         print(cryptonets_model.summary())
