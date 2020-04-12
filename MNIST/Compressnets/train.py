@@ -266,7 +266,8 @@ def main(FLAGS):
     # [("dense", 100), ("dense", 800), ("activation", "square"), ("dense", 10)], 
     # [("dense", 800), ("dense", 800), ("activation", "square"), ("dense", 10)],
     # [("dense", 800), ("dense", 800), ("dense", 10)]
-    [("dense", 800), ("activation", "square"), ("dense", 10)]]
+    [("dense", 800), ("activation", "square"), ("dense", 10)],
+    [("dense", 800), ("dense", 10), ("activation", "square")]]
     print("Architectures to test:")
     for layer_list in architectures:
         print(layer_list)
