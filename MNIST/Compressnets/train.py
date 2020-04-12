@@ -262,10 +262,12 @@ def main(FLAGS):
     #generate valid architectures for a given security level and fixed layer level:
     #architectures = generate_architecture(4096) TODO
 
-    architectures = [[("dense", 25), ("dense", 800), ("activation", "square"), ("dense", 10)], 
-    [("dense", 100), ("dense", 800), ("activation", "square"), ("dense", 10)], 
-    [("dense", 800), ("dense", 800), ("activation", "square"), ("dense", 10)],
-    [("dense", 800), ("dense", 800), ("dense", 10)]]
+    architectures = 
+    [[("dense", 25), ("dense", 800), ("activation", "square"), ("dense", 10)], 
+    # [("dense", 100), ("dense", 800), ("activation", "square"), ("dense", 10)], 
+    # [("dense", 800), ("dense", 800), ("activation", "square"), ("dense", 10)],
+    # [("dense", 800), ("dense", 800), ("dense", 10)]
+    [("dense", 800), ("activation", "square"), ("dense", 10)]]
     print("Architectures to test:")
     for layer_list in architectures:
         print(layer_list)
