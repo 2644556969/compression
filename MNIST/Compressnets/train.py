@@ -94,7 +94,7 @@ def squash_layers(cryptonets_model, sess):
     x_in = np.random.rand(100, 14 * 14 * 5)
     network_out = y.eval(session=sess, feed_dict={"squashed_input:0": x_in})
     linear_out = x_in.dot(squashed_weights) + squashed_bias
-    assert np.max(np.abs(linear_out - network_out)) < 1e-3
+    assert np.max(np.abs(linear_out - network_out)) < 1e-2
 
     return (conv1_weights, (squashed_weights, squashed_bias), fc1_weights,
             fc2_weights)
@@ -130,10 +130,10 @@ def squash_layers_variable(cryptonets_model, sess, layer_list):
                 weights.append(curr_layer_weights) 
                 compressed_layer_list.append(("dense", layer_info.output_shape[1]))
                 print("processing layer", layer_info.get_config()) 
-                print("added layer", compressed_layer_list) 
 
                 curr_input = layer_info.output_shape[1]
                 dense_processed += 1 
+                print("added layer", compressed_layer_list) 
 
             else: 
                 #squash dense layers 
@@ -175,7 +175,7 @@ def squash_layers_variable(cryptonets_model, sess, layer_list):
                 network_out = y.eval(session=sess, feed_dict={"squashed_input:0": x_in})
                 linear_out = x_in.dot(squashed_weights) + squashed_bias
                 print("max difference: ",  np.max(np.abs(linear_out - network_out)))
-                assert np.max(np.abs(linear_out - network_out)) < 1e-3
+                assert np.max(np.abs(linear_out - network_out)) < 1e-2
 
 
                 #add layer 
@@ -352,7 +352,7 @@ def main(FLAGS):
             28,
             1,
         ), name="input")
-    y = model.cryptonets_model_no_conv_squashed(x, weights, compressed_layer_list)
+    y = cryptonets_model_no_conv_squashed(x, weights, compressed_layer_list)
     sess.run(tf.compat.v1.global_variables_initializer())
     mnist_util.save_model(
         sess,
