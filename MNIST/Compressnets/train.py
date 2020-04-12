@@ -262,17 +262,15 @@ def main(FLAGS):
     #generate valid architectures for a given security level and fixed layer level:
     #architectures = generate_architecture(4096) TODO
 
-    architectures = [[("dense", 25), ("dense", 800), ("activation", "square"), ("dense", 10)], 
+    architectures = [[("dense", 25), ("dense", 800), ("activation", "square"), ("dense", 10)]]
     # [("dense", 100), ("dense", 800), ("activation", "square"), ("dense", 10)], 
     # [("dense", 800), ("dense", 800), ("activation", "square"), ("dense", 10)],
     # [("dense", 800), ("dense", 800), ("dense", 10)]
-    [("dense", 800), ("activation", "square"), ("dense", 10)],
-    [("dense", 800), ("dense", 10), ("activation", "square")]]
+    # [("dense", 800), ("activation", "square"), ("dense", 10)],
+    # [("dense", 800), ("dense", 10), ("activation", "square")]]
     print("Architectures to test:")
     for layer_list in architectures:
         print(layer_list)
-
-
 
     
     accuracies = [] 
@@ -310,50 +308,57 @@ def main(FLAGS):
     best_model = np.argmax(accuracies) 
     layer_list = architectures[best_model]
 
-    # y = cryptonets_model_no_conv(x, layer_list)
-    # cryptonets_model = Model(inputs=x, outputs=y)
-    # print(cryptonets_model.summary())
+    print("best model", best_model) 
 
-    # optimizer = SGD(learning_rate=0.008, momentum=0.9)
-    # cryptonets_model.compile(
-    #     optimizer=optimizer, loss='mean_squared_error', metrics=[logit_accuracy])
+    x = Input(
+        shape=(
+            28,
+            28,
+            1,
+        ), name="input")
+    y = cryptonets_model_no_conv(x, layer_list)
+    cryptonets_model = Model(inputs=x, outputs=y)
+    print(cryptonets_model.summary())
 
-    # cryptonets_model.fit(
-    #     x_train,
-    #     y_train,
-    #     epochs=FLAGS.epochs,
-    #     batch_size=FLAGS.batch_size,
-    #     validation_data=(x_test, y_test),
-    #     verbose=1)
+    optimizer = SGD(learning_rate=0.008, momentum=0.9)
+    cryptonets_model.compile(
+        optimizer=optimizer, loss='mean_squared_error', metrics=[logit_accuracy])
 
-    # test_loss, test_acc = cryptonets_model.evaluate(x_test, y_test_label, verbose=1) #should this be y-test? No, evaluating against y_Test_label 
-    # print("Test accuracy:", test_acc)
-    # accuracies.append(test_acc)
+    cryptonets_model.fit(
+        x_train,
+        y_train,
+        epochs=FLAGS.epochs,
+        batch_size=FLAGS.batch_size,
+        validation_data=(x_test, y_test),
+        verbose=1)
 
-    # # Squash weights and save model
+    test_loss, test_acc = cryptonets_model.evaluate(x_test, y_test_label, verbose=1) #should this be y-test? No, evaluating against y_Test_label 
+    print("Test accuracy:", test_acc)
+    accuracies.append(test_acc)
+
+    # Squash weights and save model
 
 
-    # weights, compressed_layer_list = squash_layers_variable(cryptonets_model,
-    #                          tf.compat.v1.keras.backend.get_session(), layer_list)
-    # (conv1_weights, squashed_weights, fc1_weights, fc2_weights) = weights[0:4]
+    weights, compressed_layer_list = squash_layers_variable(cryptonets_model,
+                             tf.compat.v1.keras.backend.get_session(), layer_list)
 
-    # tf.reset_default_graph()
-    # sess = tf.compat.v1.Session()
+    tf.reset_default_graph()
+    sess = tf.compat.v1.Session()
 
-    # x = Input(
-    #     shape=(
-    #         28,
-    #         28,
-    #         1,
-    #     ), name="input")
-    # y = model.cryptonets_model_no_conv_squashed(x, weights, compressed_layer_list)
-    # sess.run(tf.compat.v1.global_variables_initializer())
-    # mnist_util.save_model(
-    #     sess,
-    #     ["output/BiasAdd"],
-    #     "./models",
-    #     "compressnets",
-    # )
+    x = Input(
+        shape=(
+            28,
+            28,
+            1,
+        ), name="input")
+    y = model.cryptonets_model_no_conv_squashed(x, weights, compressed_layer_list)
+    sess.run(tf.compat.v1.global_variables_initializer())
+    mnist_util.save_model(
+        sess,
+        ["output/BiasAdd"],
+        "./models",
+        "compressnets",
+    )
 
 
 if __name__ == "__main__":
