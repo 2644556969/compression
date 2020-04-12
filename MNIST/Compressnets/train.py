@@ -245,8 +245,8 @@ def logit_accuracy(y_true, y_pred_logit):
     print("hello") 
     print(y_true)
     print(y_pred_logit)
-    print(y_true.shape())
-    print(y_pred_logit.shape())
+    print(y_true.shape)
+    print(y_pred_logit.shape)
 
 
     y_test_label = tf.argmax(y_true, 1)
