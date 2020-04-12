@@ -129,6 +129,7 @@ def squash_layers_variable(cryptonets_model, sess, layer_list):
                 curr_layer_weights = layer_info.get_weights() 
                 weights.append(curr_layer_weights) 
                 compressed_layer_list.append(("dense", layer_info.output_shape[1]))
+                print("processing layer", layer_info.get_config()) 
                 print("added layer", compressed_layer_list) 
 
                 curr_input = layer_info.output_shape[1]
@@ -173,6 +174,7 @@ def squash_layers_variable(cryptonets_model, sess, layer_list):
                 x_in = np.random.rand(100, orig_input)
                 network_out = y.eval(session=sess, feed_dict={"squashed_input:0": x_in})
                 linear_out = x_in.dot(squashed_weights) + squashed_bias
+                print("max difference: ",  np.max(np.abs(linear_out - network_out)))
                 assert np.max(np.abs(linear_out - network_out)) < 1e-3
 
 
@@ -257,9 +259,6 @@ def logit_accuracy(y_true, y_pred_logit):
 
 def main(FLAGS):
     (x_train, y_train, y_train_label, x_test, y_test, y_test_label) = mnist_util.load_mnist_logit_data()
-
-    print(x_train[0])
-    print(y_train[0])
 
     #generate valid architectures for a given security level and fixed layer level:
     #architectures = generate_architecture(4096) TODO
