@@ -206,7 +206,7 @@ def cryptonets_model_no_conv_squashed(input, weights, layer_list):
             weight_index += 1 
 
 
-        else if layer_list[i][0] == "activation": 
+        elif layer_list[i][0] == "activation": 
             if layer_list[i][1] == "square": 
                 y = Activation(square_activation)(y) 
 
@@ -227,7 +227,7 @@ def cryptonets_model_no_conv(input, layer_list):
             name = "dense_" + str(dense_num)
             dense_num = dense_num + 1
             y = Dense(param, use_bias=True, name=name)(y) 
-        else if layer_name == "activation":
+        elif layer_name == "activation":
             if param == "square":
                 y = Activation(square_activation)(y)
     return y 
