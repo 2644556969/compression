@@ -242,11 +242,6 @@ def loss(labels, logits):
         labels, logits, from_logits=True)
 
 def logit_accuracy(y_true, y_pred_logit):
-    print("hello") 
-    print(y_true)
-    print(y_pred_logit)
-    print(y_true.shape)
-    print(y_pred_logit.shape)
 
 
     y_test_label = tf.argmax(y_true, 1)
@@ -261,6 +256,8 @@ def logit_accuracy(y_true, y_pred_logit):
 def main(FLAGS):
     (x_train, y_train, y_train_label, x_test, y_test, y_test_label) = mnist_util.load_mnist_logit_data()
 
+    print(x_train[0])
+    print(y_train[0])
     x = Input(
         shape=(
             28,
@@ -271,9 +268,17 @@ def main(FLAGS):
     #generate valid architectures for a given security level and fixed layer level:
     #architectures = generate_architecture(4096) TODO
 
-    architectures = [[("dense", 40), ("dense", 800), ("activation", "square"), ("dense", 10)]]
+    architectures = [[("dense", 25), ("dense", 800), ("activation", "square"), ("dense", 10)], 
+    [("dense", 100), ("dense", 800), ("activation", "square"), ("dense", 10)], 
+    [("dense", 800), ("dense", 800), ("activation", "square"), ("dense", 10)],
+    [("dense", 800), ("dense", 800), ("dense", 10)]]
+    print("Architectures to test:")
+    for layer_list in architectures:
+        print(layer_list)
+    
 
-    #[("dense", 800), ("dense", 800), ("dense", 10)]
+
+    
     accuracies = [] 
     for layer_list in architectures: 
         y = cryptonets_model_no_conv(x, layer_list)
