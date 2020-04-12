@@ -242,6 +242,7 @@ def loss(labels, logits):
         labels, logits, from_logits=True)
 
 def logit_accuracy(y_true, y_pred_logit):
+    print("hello") 
     print(y_true)
     print(y_pred_logit)
 
