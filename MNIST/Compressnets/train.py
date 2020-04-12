@@ -141,7 +141,7 @@ def squash_layers_variable(cryptonets_model, sess, layer_list):
                 for j in range(i, end): 
                     name = "dense_" + str(dense_processed) 
                     layer_info = layers[layer_names.index(name)]
-                    print("processing layer", layer_info) 
+                    print("processing layer", layer_info.get_config()) 
                     layer_weights = layer_info.get_weights() 
                     y = Dense(layer_info.output_shape[1], 
                         use_bias = True, 
@@ -153,6 +153,8 @@ def squash_layers_variable(cryptonets_model, sess, layer_list):
                     dense_processed += 1 
 
                 #compress this multi-layer dense model into one layer 
+
+                sess.run(tf.compat.v1.global_variables_initializer())
 
                 # Pass 0 to get bias
                 squashed_bias = y.eval(
