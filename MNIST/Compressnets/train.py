@@ -105,11 +105,12 @@ def squash_layers(cryptonets_model, sess):
 def squash_layers_variable(cryptonets_model, sess, layer_list):
     layers = cryptonets_model.layers
     layer_names = [layer.name for layer in layers]
-    
+
     weights = [] 
     compressed_layer_list = [] 
     curr_input = 784 
     dense_processed = 0 
+    dense_added = 0 
 
     i = 0 
     while i < len(layer_list):
@@ -135,10 +136,11 @@ def squash_layers_variable(cryptonets_model, sess, layer_list):
             else: 
                 #squash dense layers 
                 orig_input = curr_input 
-                y = Input(shape=(curr_input,), name = "squashed_input")
+                y = Input(shape=(orig_input,), name = "squashed_input")
                 for j in range(i, end): 
                     name = "dense_" + str(dense_processed) 
                     layer_info = layers[layer_names.index(name)]
+                    print("processing layer", layer_info) 
                     layer_weights = layer_info.get_weights() 
                     y = Dense(layer_info.output_shape[1], 
                         use_bias = True, 
@@ -155,7 +157,7 @@ def squash_layers_variable(cryptonets_model, sess, layer_list):
                 squashed_bias = y.eval(
                     session=sess,
                     feed_dict={
-                        "squashed_input:0": np.zeros((1, orig_input))
+                        "squashed_input:0": np.zeros((orig_input, 1))
                     })
                 squashed_bias_plus_weights = y.eval(
                     session=sess, feed_dict={
@@ -165,7 +167,7 @@ def squash_layers_variable(cryptonets_model, sess, layer_list):
                 print("squashed layers")
 
                 #sanity check 
-                x_in = np.random.rand(100, 14 * 14 * 5)
+                x_in = np.random.rand(orig_input, 100)
                 network_out = y.eval(session=sess, feed_dict={"squashed_input:0": x_in})
                 linear_out = x_in.dot(squashed_weights) + squashed_bias
                 assert np.max(np.abs(linear_out - network_out)) < 1e-3
@@ -221,7 +223,7 @@ def cryptonets_model_no_conv(input, layer_list):
     for layer_name, param in layer_list:
         if layer_name == "dense":
             name = "dense_" + str(dense_num)
-            dense_num = dense_num + 1
+            dense_num += 1
             y = Dense(param, use_bias=True, name=name)(y) 
         elif layer_name == "activation":
             if param == "square":
