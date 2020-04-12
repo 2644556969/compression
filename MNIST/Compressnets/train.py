@@ -105,11 +105,7 @@ def squash_layers(cryptonets_model, sess):
 def squash_layers_variable(cryptonets_model, sess, layer_list):
     layers = cryptonets_model.layers
     layer_names = [layer.name for layer in layers]
-    conv1_weights = layers[layer_names.index('conv2d_1')].get_weights()
-    conv2_weights = layers[layer_names.index('conv2d_2')].get_weights()
-    fc1_weights = layers[layer_names.index('fc_1')].get_weights()
-    fc2_weights = layers[layer_names.index('fc_2')].get_weights()
-
+    
     weights = [] 
     compressed_layer_list = [] 
     curr_input = 784 
