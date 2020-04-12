@@ -183,6 +183,34 @@ def squash_layers_variable(cryptonets_model, sess, layer_list):
 
     return weights, compressed_layer_list 
 
+#geenrates a compressed model with pre-trained weights 
+
+def cryptonets_model_no_conv_squashed(input, weights, layer_list):
+
+    #start with a flatten layer and then go thru rest of layer list 
+
+    def square_activation(x):
+        return x * x
+
+    y = tf.reshape(input, [-1, 28 * 28])
+    weight_index = 0 
+    for i in range(len(layer_list)): 
+        if layer_list[i][0] == "dense": 
+            layer_weights = weights[weight_index]
+            y = Dense(layer_list[i][1], 
+                use_bias=True, 
+                name = "dense_" + str(weight_index), 
+                trainable = False, 
+                kernel_initializer=tf.compat.v1.constant_initializer(layer_weights[0]),
+                bias_initializer=tf.compat.v1.constant_initializer(layer_weights[1]))(y)
+            weight_index += 1 
+
+
+        else if layer_list[i][0] == "activation": 
+            if layer_list[i][1] == "square": 
+                y = Activation(square_activation)(y) 
+
+    return y 
 
 
 ##shallow neural network with a variable number of layers 
@@ -293,28 +321,29 @@ def main(FLAGS):
     accuracies.append(test_acc)
 
     # Squash weights and save model
-    weights = squash_layers_variable(cryptonets_model,
-                             tf.compat.v1.keras.backend.get_session())
+
+
+    weights, compressed_layer_list = squash_layers_variable(cryptonets_model,
+                             tf.compat.v1.keras.backend.get_session(), layer_list)
     (conv1_weights, squashed_weights, fc1_weights, fc2_weights) = weights[0:4]
 
     tf.reset_default_graph()
     sess = tf.compat.v1.Session()
 
-    # x = Input(
-    #     shape=(
-    #         28,
-    #         28,
-    #         1,
-    #     ), name="input")
-    # y = model.cryptonets_model_squashed(x, conv1_weights, squashed_weights,
-    #                                     fc2_weights)
-    # sess.run(tf.compat.v1.global_variables_initializer())
-    # mnist_util.save_model(
-    #     sess,
-    #     ["output/BiasAdd"],
-    #     "./models",
-    #     "cryptonets",
-    # )
+    x = Input(
+        shape=(
+            28,
+            28,
+            1,
+        ), name="input")
+    y = model.cryptonets_model_no_conv_squashed(x, weights, compressed_layer_list)
+    sess.run(tf.compat.v1.global_variables_initializer())
+    mnist_util.save_model(
+        sess,
+        ["output/BiasAdd"],
+        "./models",
+        "compressnets",
+    )
 
 
 if __name__ == "__main__":
