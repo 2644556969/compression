@@ -245,11 +245,14 @@ def logit_accuracy(y_true, y_pred_logit):
     print("hello") 
     print(y_true)
     print(y_pred_logit)
+    print(y_true.shape())
+    print(y_pred_logit.shape())
 
-    y_test_label = np.argmax(y_true, 1)
-    y_pred = np.argmax(y_pred_logit, 1)
-    correct_prediction = np.equal(y_pred, y_test_label)
-    test_accuracy = np.mean(correct_prediction)
+
+    y_test_label = tf.argmax(y_true, 1)
+    y_pred = tf.argmax(y_pred_logit, 1)
+    correct_prediction = tf.equal(y_pred, y_test_label)
+    test_accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
 
     return test_accuracy 
 
