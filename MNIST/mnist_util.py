@@ -129,6 +129,7 @@ def freeze_session(session,
     )
 
     graph = session.graph
+    print(graph)
     with graph.as_default():
         freeze_var_names = list(
             set(v.op.name for v in tf.global_variables()).difference(

@@ -226,13 +226,16 @@ def cryptonets_model_no_conv(input, layer_list):
     y = Flatten()(input)
 
     dense_num = 0 
-    for layer_name, param in layer_list:
-        if layer_name == "dense":
-            name = "dense_" + str(dense_num)
+    for i in range(len(layer_list)):
+        if layer_name[i][0] == "dense":
+            if i == len(layer_list) - 1: #last layer 
+                name = "output"
+            else:
+                name = "dense_" + str(dense_num)
             dense_num += 1
-            y = Dense(param, use_bias=True, name=name)(y) 
-        elif layer_name == "activation":
-            if param == "square":
+            y = Dense(layer_name[i][1], use_bias=True, name=name)(y) 
+        elif layer_name[i][0] == "activation":
+            if layer_name[i][1] == "square":
                 y = Activation(square_activation)(y)
     return y 
 
@@ -354,6 +357,7 @@ def main(FLAGS):
         ), name="input")
     y = cryptonets_model_no_conv_squashed(x, weights, compressed_layer_list)
     sess.run(tf.compat.v1.global_variables_initializer())
+
     mnist_util.save_model(
         sess,
         ["output/BiasAdd"],
