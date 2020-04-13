@@ -200,10 +200,14 @@ def cryptonets_model_no_conv_squashed(input, weights, layer_list):
     weight_index = 0 
     for i in range(len(layer_list)): 
         if layer_list[i][0] == "dense": 
+            if i == len(layer_list) - 1: #last layer 
+                name = "output"
+            else:
+                name = "dense_" + str(weight_index)
             layer_weights = weights[weight_index]
             y = Dense(layer_list[i][1], 
                 use_bias=True, 
-                name = "dense_" + str(weight_index), 
+                name = name, 
                 trainable = False, 
                 kernel_initializer=tf.compat.v1.constant_initializer(layer_weights[0]),
                 bias_initializer=tf.compat.v1.constant_initializer(layer_weights[1]))(y)
@@ -228,10 +232,7 @@ def cryptonets_model_no_conv(input, layer_list):
     dense_num = 0 
     for i in range(len(layer_list)):
         if layer_list[i][0] == "dense":
-            if i == len(layer_list) - 1: #last layer 
-                name = "output"
-            else:
-                name = "dense_" + str(dense_num)
+            name = "dense_" + str(dense_num)
             dense_num += 1
             y = Dense(layer_list[i][1], use_bias=True, name=name)(y) 
         elif layer_list[i][0] == "activation":
