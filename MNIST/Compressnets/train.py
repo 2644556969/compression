@@ -227,15 +227,15 @@ def cryptonets_model_no_conv(input, layer_list):
 
     dense_num = 0 
     for i in range(len(layer_list)):
-        if layer_name[i][0] == "dense":
+        if layer_list[i][0] == "dense":
             if i == len(layer_list) - 1: #last layer 
                 name = "output"
             else:
                 name = "dense_" + str(dense_num)
             dense_num += 1
-            y = Dense(layer_name[i][1], use_bias=True, name=name)(y) 
-        elif layer_name[i][0] == "activation":
-            if layer_name[i][1] == "square":
+            y = Dense(layer_list[i][1], use_bias=True, name=name)(y) 
+        elif layer_list[i][0] == "activation":
+            if layer_list[i][1] == "square":
                 y = Activation(square_activation)(y)
     return y 
 
