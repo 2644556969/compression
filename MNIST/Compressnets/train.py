@@ -267,7 +267,7 @@ def main(FLAGS):
     #generate valid architectures for a given security level and fixed layer level:
     #architectures = generate_architecture(4096) TODO
 
-    architectures = [[("dense", 800), ("activation", "square"), ("dense", 10)]]
+    architectures = [[("dense", 200), ("activation", "square"), ("dense", 10)]]
     # [("dense", 100), ("dense", 800), ("activation", "square"), ("dense", 10)], 
     # [("dense", 800), ("dense", 800), ("activation", "square"), ("dense", 10)],
     # [("dense", 800), ("dense", 800), ("dense", 10)]
@@ -363,7 +363,7 @@ def main(FLAGS):
         sess,
         ["output/BiasAdd"],
         "./models",
-        "compressnets",
+        "compressnets_small",
     )
 
 
