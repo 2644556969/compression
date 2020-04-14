@@ -3,11 +3,11 @@
     "poly_modulus_degree": 8192,
     "security_level": 128,
     "coeff_modulus": [
-        40,
         30,
-        30,
-        30,
-        40
+        20,
+        20,
+        20,
+        30
     ],
-    "scale": 1073741824
+    "scale": 16777216
 }
