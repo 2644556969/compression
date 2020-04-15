@@ -351,7 +351,7 @@ def main(FLAGS):
     print("Architectures to test:")
     for i in range(len(architectures)):
         print(f"### ARCHITECTURE {i} ### ")
-        print(architecture[i])
+        print(architectures[i])
 
     
     accuracies = [] 
