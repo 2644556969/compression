@@ -1,11 +1,13 @@
 {
     "scheme_name": "HE_SEAL",
-    "poly_modulus_degree": 4096,
+    "poly_modulus_degree": 8192,
     "security_level": 128,
     "coeff_modulus": [
-        16,
-        16,
-        16,
-        16
-    ]
+        30,
+        22,
+        22,
+        22,
+        30
+    ],
+    "scale": 4194304
 }
