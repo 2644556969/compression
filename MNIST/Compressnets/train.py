@@ -261,7 +261,7 @@ def generate_architectures(max_levels, input_size, output_size, include_poly = F
     for i in range(min_levels, max_levels +1, 2):
         structure = []  
         for j in range(i): 
-            name = "dense_like" if i % 2 == 0 else "activation"
+            name = "dense_like" if j % 2 == 0 else "activation"
             structure.append(name) 
         structures.append(structure)
 
