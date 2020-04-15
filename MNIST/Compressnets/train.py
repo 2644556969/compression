@@ -11,8 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 # ==============================================================================
 """An MNIST classifier based on Cryptonets using convolutional layers. """
+"""Supports model compression of training shallow neural networks using logit data"""
+"""Generates multiple test architectures for a given cryptographic security level for HE""" 
 
 import sys
 import os
@@ -196,6 +199,9 @@ def cryptonets_model_no_conv_squashed(input, weights, layer_list):
     def square_activation(x):
         return x * x
 
+    def poly_activation(x): 
+        return .125 * (x + 2) ** 2 - .25 
+
     y = tf.reshape(input, [-1, 28 * 28])
     weight_index = 0 
     for i in range(len(layer_list)): 
@@ -217,6 +223,8 @@ def cryptonets_model_no_conv_squashed(input, weights, layer_list):
         elif layer_list[i][0] == "activation": 
             if layer_list[i][1] == "square": 
                 y = Activation(square_activation)(y) 
+            elif layer_list[i][1] == "poly":
+                y = Activation(poly_activation)(y) 
 
     return y 
 
@@ -226,6 +234,8 @@ def cryptonets_model_no_conv(input, layer_list):
 
     def square_activation(x):
         return x * x
+    def poly_activation(x): 
+        return .125 * (x + 2) ** 2 - .25 
 
     y = Flatten()(input)
 
@@ -238,12 +248,72 @@ def cryptonets_model_no_conv(input, layer_list):
         elif layer_list[i][0] == "activation":
             if layer_list[i][1] == "square":
                 y = Activation(square_activation)(y)
+            elif layer_list[i][1] == "poly":
+                y = Activation(poly_activation)(y) 
     return y 
 
 
-#creates a hyperparameter search over valid architrectures 
-# def generate_architecture(poly_modulus, bit_precision=24, security_level=128): 
-#     ##TODO## 
+#creates a hyperparameter search over valid architrectures with poly depth <= max_levels 
+def generate_architectures(max_levels, input_size, output_size, include_poly = False, include_conv = False, min_levels=3, bit_precision=24): 
+
+    #all architectures consist of linear layers plus activation functions 
+    structures = [] 
+    for i in range(min_levels, max_levels +1, 2):
+        structure = []  
+        for j in range(i): 
+            name = "dense_like" if i % 2 == 0 else "activation"
+            structure.append(name) 
+        structures.append(structure)
+
+
+    dense_options = ["dense", "bottleneck_dense"] 
+    activation_options = ["square"]
+    if include_poly:
+        activation_options.append("poly")
+
+
+    hidden_nodes_nums = {} 
+    hidden_nodes_nums["dense"] = {} 
+    hidden_nodes_nums["bottleneck_dense"] = {} 
+    hidden_nodes_nums["dense"][0] = [i for i in range(100, 1100, 100)]
+    hidden_nodes_nums["bottleneck_dense"][0] = [(a, b) for a in [25, 50, 100] for b in [100, 200, 400, 800, 1000]]
+
+
+    #generate architectures 
+    architectures = [] 
+
+    for structure in structures: 
+        for activation_option in activation_options: 
+            constructing_architectures = [[]] 
+            for i in range(len(structure)): 
+                if structure[i] == "activation":
+                    for j in constructing_architectures:
+                        j.append(("activation", activation_option))
+                elif structure[i] == "dense_like":
+                    if i == len(structure) -1: #last layer 
+                        for j in constructing_architectures: 
+                            j.append(("dense", output_size))
+
+                    else: 
+                        new_archs = [] 
+                        for arch in constructing_architectures:
+                            for dense_option in dense_options: 
+                                if dense_option == "dense":
+                                    for num in hidden_nodes_nums["dense"][i]: 
+                                        x = arch + [("dense", num)]
+                                        new_archs.append(x) 
+                                elif dense_option == "bottleneck_dense":
+                                    for num1, num2 in hidden_nodes_nums["bottleneck_dense"][i]:
+                                        x = arch + [("dense", num1)]
+                                        x.append(("dense", num2))
+                                        new_archs.append(x)
+                        constructing_architectures = new_archs 
+
+            architectures.extend(constructing_architectures) 
+
+    return architectures 
+
+
 
 def loss(labels, logits):
     return keras.losses.categorical_crossentropy(
@@ -266,16 +336,22 @@ def main(FLAGS):
 
     #generate valid architectures for a given security level and fixed layer level:
     #architectures = generate_architecture(4096) TODO
+    max_levels = 4
+    input_size = 784
+    output_size = 10 
 
-    architectures = [[("dense", 200), ("activation", "square"), ("dense", 10)]]
+    architectures = generate_architectures(max_levels, input_size, output_size)
+
+    #[[("dense", 200), ("activation", "square"), ("dense", 10)]]
     # [("dense", 100), ("dense", 800), ("activation", "square"), ("dense", 10)], 
     # [("dense", 800), ("dense", 800), ("activation", "square"), ("dense", 10)],
     # [("dense", 800), ("dense", 800), ("dense", 10)]
     # [("dense", 800), ("activation", "square"), ("dense", 10)],
     # [("dense", 800), ("dense", 10), ("activation", "square")]]
     print("Architectures to test:")
-    for layer_list in architectures:
-        print(layer_list)
+    for i in range(len(architectures)):
+        print(f"### ARCHITECTURE {i} ### ")
+        print(architecture[i])
 
     
     accuracies = [] 
