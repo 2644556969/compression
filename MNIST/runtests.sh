@@ -7,11 +7,11 @@ filename="trainresults"
 num_tests=10 
 
 if ["$1" != ""]; then 
-	filename = $1 
+	filename=$1 
 fi
 
 if ["$2" != ""]; then 
-	num_tests = $2 
+	num_tests=$2 
 fi
 
 for i in {1..$num_tests}
