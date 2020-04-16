@@ -389,6 +389,11 @@ def main(FLAGS):
     best_model = np.argmax(accuracies) 
     layer_list = architectures[best_model]
 
+    print("DATA")
+    print("architecture, test_acc")
+    for i in range(len(architectures)):
+        print(architectures[i][0:2], accuracies[i])
+
     print("best model", best_model) 
 
     x = Input(
