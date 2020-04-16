@@ -254,7 +254,7 @@ def cryptonets_model_no_conv(input, layer_list):
 
 
 #creates a hyperparameter search over valid architrectures with poly depth <= max_levels 
-def generate_architectures(max_levels, input_size, output_size, include_poly = False, include_conv = False, min_levels=3, bit_precision=24): 
+def generate_architectures(max_levels, input_size, output_size, include_bottleneck= True, include_poly = False, include_conv = False, min_levels=3, bit_precision=24): 
 
     #all architectures consist of linear layers plus activation functions 
     structures = [] 
@@ -266,7 +266,9 @@ def generate_architectures(max_levels, input_size, output_size, include_poly = F
         structures.append(structure)
 
 
-    dense_options = ["dense", "bottleneck_dense"] 
+    dense_options = ["dense"]
+    if include_bottleneck:
+        dense_options.append("bottleneck_dense")
     activation_options = ["square"]
     if include_poly:
         activation_options.append("poly")
@@ -340,7 +342,7 @@ def main(FLAGS):
     input_size = 784
     output_size = 10 
 
-    architectures = generate_architectures(max_levels, input_size, output_size)
+    architectures = generate_architectures(max_levels, input_size, output_size, include_bottleneck=False)
 
     #[[("dense", 200), ("activation", "square"), ("dense", 10)]]
     # [("dense", 100), ("dense", 800), ("activation", "square"), ("dense", 10)], 
@@ -367,15 +369,18 @@ def main(FLAGS):
         print(cryptonets_model.summary())
 
         optimizer = SGD(learning_rate=0.008, momentum=0.9)
+        #cryptonets_model.compile(
+        #    optimizer=optimizer, loss='mean_squared_error', metrics=[logit_accuracy])
         cryptonets_model.compile(
-            optimizer=optimizer, loss='mean_squared_error', metrics=[logit_accuracy])
+            optimizer=optimizer, loss=loss, metrics=["accuracy"])
+
 
         cryptonets_model.fit(
             x_train,
-            y_train,
+            y_train_label, #y_train
             epochs=FLAGS.epochs,
             batch_size=FLAGS.batch_size,
-            validation_data=(x_test, y_test),
+            validation_data=(x_test, y_test_label), #y_test
             verbose=1)
 
         test_loss, test_acc = cryptonets_model.evaluate(x_test, y_test_label, verbose=1) #should this be y-test? No, evaluating against y_Test_label 
