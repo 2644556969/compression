@@ -1,22 +1,25 @@
 #!/bin/bash 
 
-directory="./results"
+DIRECTORY="./results"
 
-filename="trainresults"
+FILENAME=$1 
 
-num_tests=10 
+NUMTESTS=$2
 
-if ["$1" != ""]; then 
-	filename=$1 
-fi
 
-if ["$2" != ""]; then 
-	num_tests=$2 
-fi
 
-for i in {1..$num_tests}
+for i in {1..10}
 do 
 	echo "Print $i" 
-	echo "Print $directory/$filename$i"
+	echo "Print $DIRECTORY/$FILENAME$i"
+	#python Compressnets/train.py --epochs=20 --num_
+done 
+
+
+
+for i in {1.."$NUMTESTS"}
+do 
+	echo "Print $i" 
+	echo "Print $DIRECTORY/$FILENAME$i"
 	#python Compressnets/train.py --epochs=20 --num_
 done 
