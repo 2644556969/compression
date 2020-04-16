@@ -1,10 +1,10 @@
 #!/bin/bash 
 
-directory = "./results"
+directory="./results"
 
-filename = "trainresults"
+filename="trainresults"
 
-num_tests = 10 
+num_tests=10 
 
 if ["$1" != ""]; then 
 	filename = $1 
