@@ -35,9 +35,9 @@ tf.app.flags.DEFINE_integer('save_freq', 60,
                             """How often to save model to disk (seconds).""")
 tf.app.flags.DEFINE_boolean('resume', False,
                             """Continue training the previous model""")
-tf.app.flags.DEFINE_string('log_dir', './log/cifar10', "   "
-                           "Directory where to write event logs."
-                           "")
+# tf.app.flags.DEFINE_string('log_dir', './log/cifar10', "   "
+#                            "Directory where to write event logs."
+#                            "")
 tf.app.flags.DEFINE_boolean('clip_grads', True,
                             """Clip gradients to [-0.25, 0.25] or not""")
 tf.app.flags.DEFINE_boolean('moving_averages', False,
