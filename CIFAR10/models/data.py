@@ -215,6 +215,10 @@ def train_inputs(data_dir):
         capacity=20000 + 3 * FLAGS.batch_size,
         min_after_dequeue=20000)
 
+    #perhaps this is where you add the logit data? 
+    print("test this is where you add logit")
+    print(labels[0])
+
     # Display the training images in the visualizer
     tf.summary.image('images', images)
 
