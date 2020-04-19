@@ -42,9 +42,9 @@ FLAGS = tf.app.flags.FLAGS
 
 
 #BY DEFAULT, USE BN AND TRAIN POLY ACT 
-tf.app.flags.DEFINE_integer('batch_norm', True,
+tf.app.flags.DEFINE_boolean('batch_norm', True,
                             """USE BATCH NORM """)
-tf.app.flags.DEFINE_integer('train_poly_act', True,
+tf.app.flags.DEFINE_boolean('train_poly_act', True,
                             """USE TRAIN POLY ACT""")
 
 
