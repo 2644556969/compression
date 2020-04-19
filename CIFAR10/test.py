@@ -40,9 +40,6 @@ from train import get_run_dir
 
 FLAGS = tf.app.flags.FLAGS
 
-tf.app.flags.DEFINE_string('save_dir', './saved_models', "   "
-                           "Directory where to write event logs."
-                           "")
 
 #BY DEFAULT, USE BN AND TRAIN POLY ACT 
 tf.app.flags.DEFINE_integer('batch_norm', True,
