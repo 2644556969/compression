@@ -43,6 +43,14 @@ tf.app.flags.DEFINE_boolean('clip_grads', True,
 tf.app.flags.DEFINE_boolean('moving_averages', False,
                             """Use moving averages for loss""")
 
+#THINGS TO DO
+# make flag for number of tests to run, and a way to specify importing architectures 
+# modify get_run_dir and the model creation portion to save multiple models 
+#save models to ./saved_models/<name>/0, 1, 2 
+# pick the best one at the end. 
+
+
+
 MOVING_AVERAGE_DECAY = 0.9999
 
 
@@ -61,6 +69,7 @@ def get_run_dir(log_dir, model_name):
             run = len(os.listdir(model_dir))
     else:
         run = 0
+    #this is # of tests 
     return os.path.join(model_dir, '%d' % run)
 
 
@@ -69,6 +78,8 @@ def train_ops():
     # Get training parameters
     data_dir = FLAGS.data_dir
     batch_size = FLAGS.batch_size
+
+
 
     # Create global step counter
     global_step = tf.Variable(0, name='global_step', trainable=False)
@@ -109,7 +120,7 @@ def train_ops():
 
     # Clip gradients to [-0.25, 0.25]
     if FLAGS.clip_grads:
-        print("Clipping gradients to [-0.25, 0.25]")
+        print("Clipping gradients to [-0.25, 0.25]") 
         gvs = optimizer.compute_gradients(loss)
         capped_gvs = []
         for grad, var in gvs:
@@ -182,7 +193,10 @@ def train_loop():
 
 def main(argv=None):
     data.maybe_download_and_extract(FLAGS.data_dir)
-    train_loop()
+    #loop this 
+    for i in ["cnn", "small_cnn", "small_cnnact"]: 
+        FLAGS.model = i
+        train_loop()
 
 
 if __name__ == '__main__':
