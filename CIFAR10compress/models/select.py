@@ -15,14 +15,14 @@ def by_name(name, FLAGS, training=False):
             training=training,
             train_poly_act=FLAGS.train_poly_act,
             batch_norm=FLAGS.batch_norm)
-    if name == 'small_cnn':
+    elif name == 'small_cnn':
         print('train polynomial activations?', FLAGS.train_poly_act)
         print("batch norm?", FLAGS.batch_norm)
         model = cnn.smallCNN(
             training=training,
             train_poly_act=FLAGS.train_poly_act,
             batch_norm=FLAGS.batch_norm)
-    if name == 'small_cnnact':
+    elif name == 'small_cnnact':
         print('train polynomial activations?', FLAGS.train_poly_act)
         print("batch norm?", FLAGS.batch_norm)
         model = cnn.smallCNNAct(
