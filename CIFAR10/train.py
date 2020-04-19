@@ -31,13 +31,13 @@ tf.app.flags.DEFINE_integer('max_steps', 10000,
                             """Number of batches to run.""")
 tf.app.flags.DEFINE_integer('log_freq', 10,
                             """How often to log results (steps).""")
-tf.app.flags.DEFINE_integer('save_freq', 60,
+tf.app.flags.DEFINE_integer('save_freq', 300,
                             """How often to save model to disk (seconds).""")
 tf.app.flags.DEFINE_boolean('resume', False,
                             """Continue training the previous model""")
-# tf.app.flags.DEFINE_string('log_dir', './log/cifar10', "   "
-#                            "Directory where to write event logs."
-#                            "")
+tf.app.flags.DEFINE_string('save_dir', './tests', "   "
+                           "Directory where to write event logs."
+                           "")
 tf.app.flags.DEFINE_boolean('clip_grads', True,
                             """Clip gradients to [-0.25, 0.25] or not""")
 tf.app.flags.DEFINE_boolean('moving_averages', False,
@@ -133,7 +133,7 @@ def train_ops():
 def train_loop():
     train_op, loss, accuracy = train_ops()
 
-    run_dir = get_run_dir(FLAGS.log_dir, FLAGS.model)
+    run_dir = get_run_dir(FLAGS.save_dir, FLAGS.model)
     checkpoint_dir = os.path.join(run_dir, 'train')
 
     # This class implements the callbacks for the logger
