@@ -35,7 +35,7 @@ tf.app.flags.DEFINE_integer('save_freq', 300,
                             """How often to save model to disk (seconds).""")
 tf.app.flags.DEFINE_boolean('resume', False,
                             """Continue training the previous model""")
-tf.app.flags.DEFINE_string('save_dir', './tests', "   "
+tf.app.flags.DEFINE_string('save_dir', './saved_models', "   "
                            "Directory where to write event logs."
                            "")
 tf.app.flags.DEFINE_boolean('clip_grads', True,

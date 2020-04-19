@@ -40,11 +40,21 @@ from train import get_run_dir
 
 FLAGS = tf.app.flags.FLAGS
 
+tf.app.flags.DEFINE_string('save_dir', './saved_models', "   "
+                           "Directory where to write event logs."
+                           "")
+
+#BY DEFAULT, USE BN AND TRAIN POLY ACT 
+tf.app.flags.DEFINE_integer('batch_norm', True,
+                            """USE BATCH NORM """)
+tf.app.flags.DEFINE_integer('train_poly_act', True,
+                            """USE TRAIN POLY ACT""")
+
 
 def save_weights():
     """Saves CIFAR10 weights"""
     FLAGS.resume = True  # Get saved weights, not new ones
-    run_dir = get_run_dir(FLAGS.log_dir, FLAGS.model)
+    run_dir = get_run_dir(FLAGS.save_dir, FLAGS.model)
     print('run_dir', run_dir)
     checkpoint_dir = os.path.join(run_dir, 'train')
 
@@ -68,7 +78,7 @@ def save_weights():
                 global_step = ckpt.model_checkpoint_path.split('/')[-1].split(
                     '-')[-1]
             else:
-                print('No checkpoint file found')
+                print('### ERROR No checkpoint file found###')
                 print('ckpt_dir', checkpoint_dir)
                 print('ckpt.model_checkpoint_path', ckpt.model_checkpoint_path)
                 print('ckpt', ckpt)
