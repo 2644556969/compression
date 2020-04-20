@@ -194,9 +194,10 @@ def train_loop():
 def main(argv=None):
     data.maybe_download_and_extract(FLAGS.data_dir)
     #loop this 
-    for i in ["cnn", "small_cnn", "small_cnnact"]: 
+    for i in ["small_cnn", "small_cnnact"]: 
         FLAGS.model = i
         train_loop()
+        tf.reset_default_graph()
 
 
 if __name__ == '__main__':
