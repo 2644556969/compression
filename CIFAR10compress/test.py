@@ -194,7 +194,7 @@ def perform_inference():
     print('Performing inference')
 
     FLAGS.resume = True  # Get saved weights, not new ones
-    run_dir = get_run_dir(FLAGS.log_dir, FLAGS.model)
+    run_dir = get_run_dir(FLAGS.save_dir, FLAGS.model)
     checkpoint_dir = os.path.join(run_dir, 'train')
     fused_graph_file = os.path.join(checkpoint_dir, 'fused_graph.pb')
 
