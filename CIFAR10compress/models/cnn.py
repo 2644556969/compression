@@ -62,8 +62,8 @@ class smallCNN(model.Model):
                  batch_norm,
                  wd=WEIGHT_DECAY,
                  training=True):
-        super(CNN, self).__init__(
-            model_name='cnn',
+        super(smallCNN, self).__init__(
+            model_name='small_cnn',
             wd=wd,
             training=training,
             train_poly_act=train_poly_act,
@@ -112,8 +112,8 @@ class smallCNNAct(model.Model):
                  batch_norm,
                  wd=WEIGHT_DECAY,
                  training=True):
-        super(CNN, self).__init__(
-            model_name='cnn',
+        super(smallCNNAct, self).__init__(
+            model_name='small_cnnact',
             wd=wd,
             training=training,
             train_poly_act=train_poly_act,

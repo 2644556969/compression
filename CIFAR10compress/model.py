@@ -39,7 +39,7 @@ class Model(object):
         self.model_name = model_name
         self.train_poly_act = train_poly_act
         self.batch_norm = batch_norm
-        print("Creating model with decay", wd)
+        print("Creating model ", model_name, " with decay", wd)
 
     def _name_to_filename(self, var_name):
         """Given a variable name, returns the filename where to store it"""
