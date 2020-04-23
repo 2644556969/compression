@@ -7,7 +7,7 @@ This directory was originally adapted from https://github.com/NervanaSystems/he-
 HE-transformer expects serialized models to have inputs as placeholders, and model weights stored as constants.
 * `test.py` also performs this serialization. Finally, `test.py` also optimizes the model for inference, for example by folding batch norm weights into convolution weights to reduce the mutliplicative depth of the model.
 
-By default, three models are trained on logit data 
+By default, train.py trains these three models are trained on logit data 
 
 cnn (depth 8)
 
@@ -33,7 +33,7 @@ python train.py --model=cnn --batch_norm=True --train_poly_act=True [--max_steps
 python train.py --model=cnn --resume=True
 ```
 
-# 2. Run trained model:
+# 2. Run trained model (specify --model=<modelname>)
 ## Skip inference, just export serialized graph:
 ```python
 NGRAPH_TF_BACKEND=NOP NGRAPH_ENABLE_SERIALIZE=1 python test.py --model=cnn --batch_norm=True --train_poly_act=True --batch_size=1
@@ -41,7 +41,7 @@ NGRAPH_TF_BACKEND=NOP NGRAPH_ENABLE_SERIALIZE=1 python test.py --model=cnn --bat
 
 ## Run inference on CPU backend:
 ```python
-python test.py --model=cnn --batch_norm=True --train_poly_act=True --batch_size=10000
+python test.py --model=cnn --batch_norm=True --train_poly_act=True --batch_norm=True --train_poly_act=True --batch_size=10000
 ```
 
 ## Run inference on HE backend

@@ -342,9 +342,13 @@ def main(FLAGS):
     input_size = 784
     output_size = 10 
 
-    architectures = generate_architectures(max_levels, input_size, output_size, include_bottleneck=False)
+    architectures = generate_architectures(max_levels, input_size, output_size, include_bottleneck=False)]
+    architectures = [[("dense", 100), ("activation", "square"), ("dense", 10)]]
+    #[[("dense", 400), ("activation", "square"), ("dense", 10)]]
+    #[[("dense", 800), ("activation", "square"), ("dense", 10)]]
+    #[[("dense", 50), ("dense", 800),("activation", "square"), ("dense", 10)]]
 
-    #[[("dense", 200), ("activation", "square"), ("dense", 10)]]
+    #[]
     # [("dense", 100), ("dense", 800), ("activation", "square"), ("dense", 10)], 
     # [("dense", 800), ("dense", 800), ("activation", "square"), ("dense", 10)],
     # [("dense", 800), ("dense", 800), ("dense", 10)]
@@ -449,7 +453,7 @@ def main(FLAGS):
         sess,
         ["output/BiasAdd"],
         "./models",
-        "compressnets_small",
+        "compressed_one_layer_100",
     )
 
 
