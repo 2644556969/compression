@@ -342,7 +342,7 @@ def main(FLAGS):
     input_size = 784
     output_size = 10 
 
-    architectures = generate_architectures(max_levels, input_size, output_size, include_bottleneck=False)]
+    #architectures = generate_architectures(max_levels, input_size, output_size, include_bottleneck=False)]
     architectures = [[("dense", 100), ("activation", "square"), ("dense", 10)]]
     #[[("dense", 400), ("activation", "square"), ("dense", 10)]]
     #[[("dense", 800), ("activation", "square"), ("dense", 10)]]
@@ -416,15 +416,17 @@ def main(FLAGS):
     print(cryptonets_model.summary())
 
     optimizer = SGD(learning_rate=0.008, momentum=0.9)
+    # cryptonets_model.compile(
+    #     optimizer=optimizer, loss='mean_squared_error', metrics=[logit_accuracy])
     cryptonets_model.compile(
-        optimizer=optimizer, loss='mean_squared_error', metrics=[logit_accuracy])
+        optimizer=optimizer, loss=loss, metrics=["accuracy"])
 
     cryptonets_model.fit(
         x_train,
-        y_train,
+        y_train_label,
         epochs=FLAGS.epochs,
         batch_size=FLAGS.batch_size,
-        validation_data=(x_test, y_test),
+        validation_data=(x_test, y_test_label),
         verbose=1)
 
     test_loss, test_acc = cryptonets_model.evaluate(x_test, y_test_label, verbose=1) #should this be y-test? No, evaluating against y_Test_label 
