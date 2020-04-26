@@ -56,10 +56,12 @@ def load_mnist_data(start_batch=0, batch_size=10000):
     return (x_train, y_train, x_test, y_test)
 
 
-#Gets features from MNIST and sets y_train, y_test as the most accurate logit model so far.
+#Gets features from MNIST dataset in correct format, and sets y_train, y_test to be from deep, accurate teacher model logits 
+
 #
 #
-def load_mnist_logit_data(start_batch=0, batch_size=10000):
+def load_mnist_logit_data(start_batch=0, batch_size=10000, y_train_logit_file='logit_out_train.h5',
+    y_test_logit_file='logit_out_test.h5', logit_scale=1):
 
     mnist = tf.keras.datasets.mnist
     (x_train, y_train_label), (x_test, y_test_label) = mnist.load_data()
@@ -67,6 +69,8 @@ def load_mnist_logit_data(start_batch=0, batch_size=10000):
     y_test_label = tf.compat.v1.keras.utils.to_categorical(y_test_label, num_classes=10)
     x_train = np.expand_dims(x_train, axis=-1)
     x_test = np.expand_dims(x_test, axis=-1)
+
+    #ADD option to take in x_train, x_test from a pre-processed augmented image dataset 
 
     x_train = x_train.astype("float32")
     x_test = x_test.astype("float32")
@@ -78,15 +82,16 @@ def load_mnist_logit_data(start_batch=0, batch_size=10000):
 
     ##Adding logits from convolutional MNIST model  
 
-    h5f = h5py.File('logit_out_train.h5' , 'r')
+    h5f = h5py.File(y_train_logit_file , 'r')
     y_train = h5f['dataset_1'][:]
     h5f.close()
 
-    h5f2 = h5py.File('logit_out_test.h5' , 'r')
+    h5f2 = h5py.File(y_test_logit_file , 'r')
     y_test = h5f2['dataset_1'][:]
     h5f2.close()
 
-
+    y_train = y_train * logit_scale 
+    y_test = y_test * logit_scale
 
     return (x_train, y_train, y_train_label, x_test, y_test, y_test_label)
 

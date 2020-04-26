@@ -334,7 +334,15 @@ def logit_accuracy(y_true, y_pred_logit):
 
 
 def main(FLAGS):
-    (x_train, y_train, y_train_label, x_test, y_test, y_test_label) = mnist_util.load_mnist_logit_data()
+
+    y_train_logit_file = 'acc_train_logit_out.h5'
+    y_test_logit_file = 'acc_test_logit_out.h5'
+    logit_scale = 1 #[0.1, 1, 10, 100]
+
+    (x_train, y_train, y_train_label, x_test, y_test, y_test_label) = mnist_util.load_mnist_logit_data(
+    y_train_logit_file=y_train_logit_file,
+    y_test_logit_file=y_test_logit_file,
+    logit_scale=logit_scale)
 
     #generate valid architectures for a given security level and fixed layer level:
     #architectures = generate_architecture(4096) TODO
@@ -343,7 +351,7 @@ def main(FLAGS):
     output_size = 10 
 
     #architectures = generate_architectures(max_levels, input_size, output_size, include_bottleneck=False)]
-    architectures = [[("dense", 50), ("dense", 800),("activation", "square"), ("dense", 10)]]
+    architectures = [[("dense", 100), ("activation", "square"), ("dense", 10)]]
 
     #[]
     # [("dense", 100), ("dense", 800), ("activation", "square"), ("dense", 10)], 
@@ -370,18 +378,19 @@ def main(FLAGS):
         print(cryptonets_model.summary())
 
         optimizer = SGD(learning_rate=0.008, momentum=0.9)
-        #cryptonets_model.compile(
-        #    optimizer=optimizer, loss='mean_squared_error', metrics=[logit_accuracy])
+        #optimizer = Adam(learning_rate=0.001)
         cryptonets_model.compile(
-            optimizer=optimizer, loss=loss, metrics=["accuracy"])
+            optimizer=optimizer, loss='mean_squared_error', metrics=[logit_accuracy])
+        #cryptonets_model.compile(
+        #    optimizer=optimizer, loss=loss, metrics=["accuracy"])
 
 
         cryptonets_model.fit(
             x_train,
-            y_train_label, #y_train
+            y_train, #y_train_label 
             epochs=FLAGS.epochs,
             batch_size=FLAGS.batch_size,
-            validation_data=(x_test, y_test_label), #y_test
+            validation_data=(x_test, y_test_label), #y_test?? 
             verbose=1)
 
         test_loss, test_acc = cryptonets_model.evaluate(x_test, y_test_label, verbose=1) #should this be y-test? No, evaluating against y_Test_label 
@@ -413,14 +422,14 @@ def main(FLAGS):
     print(cryptonets_model.summary())
 
     optimizer = SGD(learning_rate=0.008, momentum=0.9)
-    # cryptonets_model.compile(
-    #     optimizer=optimizer, loss='mean_squared_error', metrics=[logit_accuracy])
     cryptonets_model.compile(
-        optimizer=optimizer, loss=loss, metrics=["accuracy"])
+         optimizer=optimizer, loss='mean_squared_error', metrics=[logit_accuracy])
+    #cryptonets_model.compile(
+    #    optimizer=optimizer, loss=loss, metrics=["accuracy"])
 
     cryptonets_model.fit(
         x_train,
-        y_train_label,
+        y_train,
         epochs=FLAGS.epochs,
         batch_size=FLAGS.batch_size,
         validation_data=(x_test, y_test_label),
@@ -428,7 +437,6 @@ def main(FLAGS):
 
     test_loss, test_acc = cryptonets_model.evaluate(x_test, y_test_label, verbose=1) #should this be y-test? No, evaluating against y_Test_label 
     print("Test accuracy:", test_acc)
-    accuracies.append(test_acc)
 
     # Squash weights and save model
 
@@ -452,7 +460,7 @@ def main(FLAGS):
         sess,
         ["output/BiasAdd"],
         "./models",
-        "compressed_bottleneck_50_800_labels",
+        "compressed_accweights_100",
     )
 
 
