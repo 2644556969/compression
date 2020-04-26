@@ -337,12 +337,16 @@ def main(FLAGS):
 
     y_train_logit_file = 'acc_train_logit_out.h5'
     y_test_logit_file = 'acc_test_logit_out.h5'
-    logit_scale = 1 #[0.1, 1, 10, 100]
+    logit_scale = 100 #[0.1, 1, 10, 100]
 
     (x_train, y_train, y_train_label, x_test, y_test, y_test_label) = mnist_util.load_mnist_logit_data(
     y_train_logit_file=y_train_logit_file,
     y_test_logit_file=y_test_logit_file,
     logit_scale=logit_scale)
+
+    print("did we import correctly??")
+    print(y_train.shape)
+    print(y_train_label.shape)
 
     #generate valid architectures for a given security level and fixed layer level:
     #architectures = generate_architecture(4096) TODO
