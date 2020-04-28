@@ -188,7 +188,11 @@ def train_argument_parser():
         "--epochs", type=int, default=10, help="Number of training epochs")
     parser.add_argument(
         "--batch_size", type=int, default=128, help="Batch Size")
-
+    parser.add_argument(
+        "--save_file", type=str, default="default", help="filename to save the model to")
+    parser.add_argument(
+        "--logit_scale", type=float, default=1.0, help="how to scale logits")
+    
     return parser
 
 
