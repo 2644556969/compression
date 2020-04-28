@@ -355,7 +355,7 @@ def main(FLAGS):
     input_size = 784
     output_size = 10 
 
-    architectures = generate_architectures(max_levels, input_size, output_size, include_bottleneck=True)]
+    architectures = generate_architectures(max_levels, input_size, output_size, include_bottleneck=True)
     #architectures = [[("dense", 100), ("activation", "square"), ("dense", 10)]]
 
     #[]
@@ -370,8 +370,8 @@ def main(FLAGS):
         print(architectures[i])
 
     num_experiments = 10
-    for i in range(num_experiments):
-        print(f"EXPERIMENT #{i} BEGINNING")
+    for j in range(num_experiments):
+        print(f"EXPERIMENT #{j} BEGINNING")
         accuracies = [] 
         for layer_list in architectures: 
             x = Input(
@@ -411,7 +411,7 @@ def main(FLAGS):
             best_model = np.argmax(accuracies) 
             layer_list = architectures[best_model]
 
-            print(f"DATA RD {i}")
+            print(f"DATA RD {j}")
             print("architecture, test_acc")
             for i in range(len(architectures)):
                 print(architectures[i][0:2], accuracies[i])

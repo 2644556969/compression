@@ -355,7 +355,7 @@ def main(FLAGS):
     input_size = 784
     output_size = 10 
 
-    architectures = generate_architectures(max_levels, input_size, output_size, include_bottleneck=True)]
+    architectures = generate_architectures(max_levels, input_size, output_size, include_bottleneck=True)
     #architectures = [[("dense", 100), ("activation", "square"), ("dense", 10)]]
 
     #[]
