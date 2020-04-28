@@ -335,9 +335,9 @@ def logit_accuracy(y_true, y_pred_logit):
 
 def main(FLAGS):
 
-    y_train_logit_file = 'acc_train_logit_out.h5'
-    y_test_logit_file = 'acc_test_logit_out.h5'
-    logit_scale = 100 #[0.1, 1, 10, 100]
+    y_train_logit_file = 'acc_train_logit_out.h5' #'old_logit_out_train.h5'
+    y_test_logit_file = 'acc_test_logit_out.h5' # 'old_logit_out_test.h5'
+    logit_scale = 0.25   #[0.1, 1, 10, 100]
 
     (x_train, y_train, y_train_label, x_test, y_test, y_test_label) = mnist_util.load_mnist_logit_data(
     y_train_logit_file=y_train_logit_file,
