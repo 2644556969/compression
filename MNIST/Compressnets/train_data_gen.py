@@ -336,18 +336,14 @@ def logit_accuracy(y_true, y_pred_logit):
 
 def main(FLAGS):
 
-    y_train_logit_file = 'acc_train_logit_out.h5' #'old_logit_out_train.h5'
-    y_test_logit_file = 'acc_test_logit_out.h5' # 'old_logit_out_test.h5'
+    y_train_logit_file = 'old_logit_out_train.h5'# 'acc_train_logit_out.h5' #
+    y_test_logit_file =  'old_logit_out_test.h5' #'acc_test_logit_out.h5' # 
     logit_scale = FLAGS.logit_scale  #[0.1, 1, 10, 100]
 
     (x_train, y_train, y_train_label, x_test, y_test, y_test_label) = mnist_util.load_mnist_logit_data(
     y_train_logit_file=y_train_logit_file,
     y_test_logit_file=y_test_logit_file,
     logit_scale=logit_scale)
-
-    print("did we import correctly??")
-    print(y_train.shape)
-    print(y_train_label.shape)
 
     #generate valid architectures for a given security level and fixed layer level:
     #architectures = generate_architecture(4096) TODO
@@ -369,54 +365,55 @@ def main(FLAGS):
         print(f"### ARCHITECTURE {i} ### ")
         print(architectures[i])
 
-    num_experiments = 10
-    for j in range(num_experiments):
-        print(f"EXPERIMENT #{j} BEGINNING")
-        accuracies = [] 
-        for layer_list in architectures: 
-            x = Input(
-                shape=(
-                    28,
-                    28,
-                    1,
-                ), name="input")
-            y = cryptonets_model_no_conv(x, layer_list)
-            cryptonets_model = Model(inputs=x, outputs=y)
-            print(cryptonets_model.summary())
+    # num_experiments = 10
+    # for j in range(num_experiments):
+    #     print(f"EXPERIMENT #{j} BEGINNING")
+    accuracies = [] 
+    for layer_list in architectures: 
+        x = Input(
+            shape=(
+                28,
+                28,
+                1,
+            ), name="input")
+        y = cryptonets_model_no_conv(x, layer_list)
+        cryptonets_model = Model(inputs=x, outputs=y)
+        print(cryptonets_model.summary())
 
-            optimizer = SGD(learning_rate=0.008, momentum=0.9)
-            #optimizer = Adam(learning_rate=0.001)
-            cryptonets_model.compile(
-                optimizer=optimizer, loss='mean_squared_error', metrics=[logit_accuracy])
-            #cryptonets_model.compile(
-            #    optimizer=optimizer, loss=loss, metrics=["accuracy"])
+        optimizer = SGD(learning_rate=0.008, momentum=0.9)
+        #optimizer = Adam(learning_rate=0.001)
+        cryptonets_model.compile(
+            optimizer=optimizer, loss='mean_squared_error', metrics=[logit_accuracy])
+        #cryptonets_model.compile(
+        #    optimizer=optimizer, loss=loss, metrics=["accuracy"])
 
 
-            cryptonets_model.fit(
-                x_train,
-                y_train, #y_train_label 
-                epochs=FLAGS.epochs,
-                batch_size=FLAGS.batch_size,
-                validation_data=(x_test, y_test_label), #y_test?? 
-                verbose=1)
+        cryptonets_model.fit(
+            x_train,
+            y_train, #y_train_label 
+            epochs=FLAGS.epochs,
+            batch_size=FLAGS.batch_size,
+            validation_data=(x_test, y_test_label), #y_test?? 
+            verbose=1)
 
-            test_loss, test_acc = cryptonets_model.evaluate(x_test, y_test_label, verbose=1) #should this be y-test? No, evaluating against y_Test_label 
-            print("Test accuracy:", test_acc)
-            accuracies.append(test_acc)
+        test_loss, test_acc = cryptonets_model.evaluate(x_test, y_test_label, verbose=1) #should this be y-test? No, evaluating against y_Test_label 
+        print("Test accuracy:", test_acc)
+        accuracies.append(test_acc)
 
-            #reset graph 
-            tf.reset_default_graph()
-            sess = tf.compat.v1.Session()
+        #reset graph 
+        tf.reset_default_graph()
+        sess = tf.compat.v1.Session()
 
-        best_model = np.argmax(accuracies) 
-        layer_list = architectures[best_model]
+    best_model = np.argmax(accuracies) 
+    layer_list = architectures[best_model]
 
-        print(f"DATA RD {j}")
-        print("architecture, test_acc")
-        for i in range(len(architectures)):
-            print(architectures[i][0:2], accuracies[i])
+    #print(f"DATA RD {j}")
+    print("DATA")
+    print("architecture, test_acc")
+    for i in range(len(architectures)):
+        print(architectures[i][0:2], accuracies[i])
 
-        print("best model", best_model, layer_list, accuracies[best_model]) 
+    print("best model", best_model, layer_list, accuracies[best_model]) 
 
 
     # x = Input(

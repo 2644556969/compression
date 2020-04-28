@@ -345,9 +345,6 @@ def main(FLAGS):
     y_test_logit_file=y_test_logit_file,
     logit_scale=logit_scale)
 
-    print("did we import correctly??")
-    print(y_train.shape)
-    print(y_train_label.shape)
 
     #generate valid architectures for a given security level and fixed layer level:
     #architectures = generate_architecture(4096) TODO
