@@ -179,6 +179,8 @@ def train_loop():
 
     # Start the training loop using a monitored session (automatically takes
     # care of thread sync)
+
+    #this part of code also saves the model to checkpoint_dir at given intervals 
     with tf.train.MonitoredTrainingSession(
             checkpoint_dir=checkpoint_dir,
             save_checkpoint_secs=FLAGS.save_freq,
@@ -194,10 +196,11 @@ def train_loop():
 def main(argv=None):
     data.maybe_download_and_extract(FLAGS.data_dir)
     #loop this 
-    for i in ["small_cnn", "small_cnnact"]: 
-        FLAGS.model = i
-        train_loop()
-        tf.reset_default_graph()
+    # for i in ["cnn", "small_cnn", "small_cnnact"]: 
+    #     FLAGS.model = i
+    print("THIS IS MODEL:", FLAGS.model)
+    train_loop()
+    #    tf.reset_default_graph()
 
 
 if __name__ == '__main__':

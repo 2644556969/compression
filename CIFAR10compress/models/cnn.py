@@ -8,6 +8,11 @@ import model
 
 WEIGHT_DECAY = 1e2
 
+'''
+3 different model architectures for shallow CNN in model compression
+'''
+
+
 
 class CNN(model.Model):
     def __init__(self,
