@@ -51,8 +51,6 @@ tf.app.flags.DEFINE_string('encryption_parameters', '', "Filename containing jso
 tf.app.flags.DEFINE_boolean('encrypt_server_data', False,
                             """Encrypt server data (should not be used when enable_client is used)""")
 
-tf.app.flags.DEFINE_boolean('resume', False,
-                            """Continue training the previous model""")
 
 
 
