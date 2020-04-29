@@ -340,10 +340,12 @@ def main(FLAGS):
     y_test_logit_file =  'old_logit_out_test.h5' #'acc_test_logit_out.h5' # 
     logit_scale = FLAGS.logit_scale  #[0.1, 1, 10, 100]
 
-    (x_train, y_train, y_train_label, x_test, y_test, y_test_label) = mnist_util.load_mnist_logit_data(
-    y_train_logit_file=y_train_logit_file,
-    y_test_logit_file=y_test_logit_file,
-    logit_scale=logit_scale)
+    # (x_train, y_train, y_train_label, x_test, y_test, y_test_label) = mnist_util.load_mnist_logit_data(
+    # y_train_logit_file=y_train_logit_file,
+    # y_test_logit_file=y_test_logit_file,
+    # logit_scale=logit_scale)
+
+    (x_train, y_train, y_train_label, x_test, y_test, y_test_label) = mnist_util.load_mnist_logit_data_acc(logit_scale=logit_scale)
 
     #generate valid architectures for a given security level and fixed layer level:
     #architectures = generate_architecture(4096) TODO
@@ -351,7 +353,7 @@ def main(FLAGS):
     input_size = 784
     output_size = 10 
 
-    architectures = generate_architectures(max_levels, input_size, output_size, include_bottleneck=True)
+    architectures = generate_architectures(max_levels, input_size, output_size, include_bottleneck=False)
     #architectures = [[("dense", 100), ("activation", "square"), ("dense", 10)]]
 
     #[]
