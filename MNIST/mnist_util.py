@@ -81,15 +81,15 @@ def load_mnist_logit_data(start_batch=0, batch_size=10000, y_train_logit_file='l
     y_test_label = y_test_label[start_batch:start_batch + batch_size]
     
     #test training stuff 
-    #f1 = h5py.File('acc_train_images.h5', 'r')
-    #x_train = f1['dataset_1'][:]
-    #f1.close() 
+    f1 = h5py.File('acc_train_images.h5', 'r')
+    x_train = f1['dataset_1'][:]
+    f1.close() 
 
-    #f2 = h5py.File('acc_test_images.h5', 'r')
-    #x_test = f2['dataset_1'][:]
-    #f2.close()
-    #x_train = x_train /2 + .5 
-    #x_test = x_test /2 + .5  
+    f2 = h5py.File('acc_test_images.h5', 'r')
+    x_test = f2['dataset_1'][:]
+    f2.close()
+    x_train = x_train /2 + .5 
+    x_test = x_test /2 + .5  
 
     ##Adding logits from convolutional MNIST model  
 
