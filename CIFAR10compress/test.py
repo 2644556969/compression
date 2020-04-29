@@ -34,6 +34,9 @@ from tensorflow.python.framework import dtypes
 from tensorflow.python.tools import freeze_graph
 from tensorflow.python.platform import gfile
 
+from tensorflow.core.protobuf import rewriter_config_pb2
+
+
 import ngraph_bridge
 
 from train import get_run_dir
@@ -43,9 +46,51 @@ FLAGS = tf.app.flags.FLAGS
 
 tf.app.flags.DEFINE_integer('model_number', -1,
                             """Specified model number in a directory""")
+tf.app.flags.DEFINE_string('backend', 'HE_SEAL', "backend")
+tf.app.flags.DEFINE_string('encryption_parameters', '', "Filename containing json description of encryption parameters, or json description itself")
+tf.app.flags.DEFINE_boolean('encrypt_server_data', False,
+                            """Encrypt server data (should not be used when enable_client is used)""")
+
+tf.app.flags.DEFINE_boolean('resume', False,
+                            """Continue training the previous model""")
 
 
-#SET UP CONFIGS TO USE HE-TRANSFORMER BACKEND
+
+
+#SET UP CONFIGS TO USE HE-TRANSFORMER BACKEND (from MNIST_UTIL)
+
+def server_config_from_flags(FLAGS, tensor_param_name):
+    rewriter_options = rewriter_config_pb2.RewriterConfig()
+    rewriter_options.meta_optimizer_iterations = rewriter_config_pb2.RewriterConfig.ONE
+    rewriter_options.min_graph_nodes = -1
+    server_config = rewriter_options.custom_optimizers.add()
+    server_config.name = "ngraph-optimizer"
+    server_config.parameter_map["ngraph_backend"].s = FLAGS.backend.encode()
+    server_config.parameter_map["device_id"].s = b""
+    server_config.parameter_map[
+        "encryption_parameters"].s = FLAGS.encryption_parameters.encode()
+    server_config.parameter_map["enable_client"].s = str(
+        False).encode()
+    server_config.parameter_map["enable_gc"].s = (str(False)).encode()
+    server_config.parameter_map["mask_gc_inputs"].s = (str(
+        False)).encode()
+    server_config.parameter_map["mask_gc_outputs"].s = (str(
+        False)).encode()
+    server_config.parameter_map["num_gc_threads"].s = (str(
+        False)).encode()
+
+
+    if FLAGS.encrypt_server_data:
+        server_config.parameter_map[tensor_param_name].s = b"encrypt"
+
+    config = tf.compat.v1.ConfigProto()
+    config.MergeFrom(
+        tf.compat.v1.ConfigProto(
+            graph_options=tf.compat.v1.GraphOptions(
+                rewrite_options=rewriter_options)))
+
+    return config
+
 
 
 def save_weights():
@@ -219,14 +264,18 @@ def perform_inference():
     XXX = graph.get_tensor_by_name('XXX:0')
     YYY = graph.get_tensor_by_name('YYY:0')
 
+    print("GETTING CONFIGS")
+
+    config = server_config_from_flags(FLAGS, XXX.name)
+
     print("Running model")
-    with tf.Session(graph=graph) as sess:
+    with tf.Session(graph=graph, config=config) as sess:
         start_time = time.time()
         eval_batch_data = eval_data[0]
         eval_batch_label = eval_labels[0]
         YYY = sess.run(YYY, feed_dict={XXX: eval_batch_data})
         elapsed_time = time.time() - start_time 
-        print("total time(s)", np.round(elapsed_time, 3))
+        print("total time(s)", np.round(elapsed_time, 6))
 
     report_accuracy(YYY, eval_batch_label)
 
