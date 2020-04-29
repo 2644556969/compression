@@ -384,10 +384,10 @@ def main(FLAGS):
 
         optimizer = SGD(learning_rate=0.008, momentum=0.9)
         #optimizer = Adam(learning_rate=0.001)
-        # cryptonets_model.compile(
-        #     optimizer=optimizer, loss='mean_squared_error', metrics=[logit_accuracy])
         cryptonets_model.compile(
-           optimizer=optimizer, loss=loss, metrics=[logit_accuracy])
+             optimizer=optimizer, loss='mean_squared_error', metrics=[logit_accuracy])
+        #cryptonets_model.compile(
+         #  optimizer=optimizer, loss=loss, metrics=[logit_accuracy])
 
 
         cryptonets_model.fit(
