@@ -109,10 +109,10 @@ def load_mnist_logit_data(start_batch=0, batch_size=10000, y_train_logit_file='l
 
 def load_mnist_logit_data_acc(start_batch=0, batch_size=10000, logit_scale=1.0):
 
-    y_train_logit_file='acc_train_logit_out.h5'
-    y_test_logit_file='acc_test_logit_out.h5'
+    x_train_image_files = ['acc_train_images.h5', 'train_images1.h5', 'train_images2.h5']
+    y_train_logit_files= ['acc_train_logit_out.h5', 'train_logit_out1.h5','train_logit_out2.h5']
 
-    x_train_image_file = 'acc_train_images.h5'
+    y_test_logit_file='acc_test_logit_out.h5'
     x_test_image_file = 'acc_test_images.h5'
 
 
@@ -134,9 +134,13 @@ def load_mnist_logit_data_acc(start_batch=0, batch_size=10000, logit_scale=1.0):
     y_test_label = y_test_label[start_batch:start_batch + batch_size]
     
     #test training stuff 
-    f1 = h5py.File(x_train_image_file, 'r')
+    f1 = h5py.File(x_train_image_files[0], 'r')
     x_train = f1['dataset_1'][:]
     f1.close() 
+    for i in range(1, len(x_train_image_files)):
+        f1 = h5py.File(x_train_image_files[i], 'r')
+        x_train = np.concatenate((x_train, f1['dataset_1'][:]))
+        f1.close() 
 
     f2 = h5py.File(x_test_image_file, 'r')
     x_test = f2['dataset_1'][:]
@@ -146,20 +150,20 @@ def load_mnist_logit_data_acc(start_batch=0, batch_size=10000, logit_scale=1.0):
 
     ##Adding logits from convolutional MNIST model  
 
-    h5f = h5py.File(y_train_logit_file , 'r')
+    h5f = h5py.File(y_train_logit_files[0] , 'r')
     y_train = h5f['dataset_1'][:]
     h5f.close()
+    for i in range(1, len(y_train_logit_files)):
+        f1 = h5py.File(y_train_logit_files[i], 'r')
+        y_train = np.concatenate((y_train, f1['dataset_1'][:]))
+        f1.close() 
 
     h5f2 = h5py.File(y_test_logit_file , 'r')
     y_test = h5f2['dataset_1'][:]
     h5f2.close()
 
-    print("ok this better work", np.argmax(y_test[0:5], axis=1))
-
     y_train = y_train * logit_scale 
     y_test = y_test * logit_scale
-
-    print(np.argmax(y_test[0:5], axis=1))
 
     return (x_train, y_train, y_train_label, x_test, y_test, y_test_label)
 

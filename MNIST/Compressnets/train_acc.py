@@ -350,7 +350,6 @@ def main(FLAGS):
 
     print("TESTING A LOT OF SHIT")
     print(x_train.shape, y_train.shape, y_train_label.shape, x_test.shape, y_test.shape, y_test_label.shape) 
-    print("img1", x_train[0])
     print("log1", y_train[0])
     print("label", y_train_label[0]) 
 
