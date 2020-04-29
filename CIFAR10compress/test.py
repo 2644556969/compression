@@ -41,13 +41,14 @@ from train import get_run_dir
 FLAGS = tf.app.flags.FLAGS
 
 
-
+tf.app.flags.DEFINE_integer('model_number', -1,
+                            """Specified model number in a directory""")
 
 def save_weights():
     """Saves CIFAR10 weights"""
     FLAGS.resume = True  # Get saved weights, not new ones
     print(FLAGS.save_dir)
-    run_dir = get_run_dir(FLAGS.save_dir, FLAGS.model)
+    run_dir = get_run_dir(FLAGS.save_dir, FLAGS.model, model_number = FLAGS.model_number)
     print('run_dir', run_dir)
     checkpoint_dir = os.path.join(run_dir, 'train')
 
@@ -91,7 +92,7 @@ def save_weights():
 def optimize_model_for_inference():
     """Optimizes CIFAR-10 model for inference"""
     FLAGS.resume = True  # Get saved weights, not new ones
-    run_dir = get_run_dir(FLAGS.save_dir, FLAGS.model)
+    run_dir = get_run_dir(FLAGS.save_dir, FLAGS.model, model_number = FLAGS.model_number)
     checkpoint_dir = os.path.join(run_dir, 'train')
     print('run_dir', run_dir)
     print('checkpoint dir', checkpoint_dir)
@@ -194,7 +195,7 @@ def perform_inference():
     print('Performing inference')
 
     FLAGS.resume = True  # Get saved weights, not new ones
-    run_dir = get_run_dir(FLAGS.save_dir, FLAGS.model)
+    run_dir = get_run_dir(FLAGS.save_dir, FLAGS.model, model_number = FLAGS.model_number)
     checkpoint_dir = os.path.join(run_dir, 'train')
     fused_graph_file = os.path.join(checkpoint_dir, 'fused_graph.pb')
 

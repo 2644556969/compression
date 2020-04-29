@@ -54,7 +54,7 @@ tf.app.flags.DEFINE_boolean('moving_averages', False,
 MOVING_AVERAGE_DECAY = 0.9999
 
 
-def get_run_dir(log_dir, model_name):
+def get_run_dir(log_dir, model_name, model_number = -1):
     model_dir = os.path.join(log_dir, model_name)
     if FLAGS.batch_norm:
         model_dir += '_bn'
@@ -69,6 +69,9 @@ def get_run_dir(log_dir, model_name):
             run = len(os.listdir(model_dir))
     else:
         run = 0
+
+    if model_number != -1:
+        run = model_number 
     #this is # of tests 
     return os.path.join(model_dir, '%d' % run)
 
