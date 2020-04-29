@@ -109,9 +109,11 @@ def load_mnist_logit_data(start_batch=0, batch_size=10000, y_train_logit_file='l
 
 def load_mnist_logit_data_acc(start_batch=0, batch_size=10000, logit_scale=1.0):
 
-    x_train_image_files = ['acc_train_images.h5', 'train_images1.h5', 'train_images2.h5']
-    y_train_logit_files= ['acc_train_logit_out.h5', 'train_logit_out1.h5','train_logit_out2.h5']
+    #x_train_image_files = ['acc_train_images.h5', 'train_images1.h5', 'train_images2.h5']
+    #y_train_logit_files= ['acc_train_logit_out.h5', 'train_logit_out1.h5','train_logit_out2.h5']
 
+    x_train_image_files = ['train_images_orig.h5']
+    y_train_logit_files = ['train_logit_out_orig.h5']
     y_test_logit_file='acc_test_logit_out.h5'
     x_test_image_file = 'acc_test_images.h5'
 
