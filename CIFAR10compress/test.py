@@ -44,6 +44,10 @@ FLAGS = tf.app.flags.FLAGS
 tf.app.flags.DEFINE_integer('model_number', -1,
                             """Specified model number in a directory""")
 
+
+#SET UP CONFIGS TO USE HE-TRANSFORMER BACKEND
+
+
 def save_weights():
     """Saves CIFAR10 weights"""
     FLAGS.resume = True  # Get saved weights, not new ones
@@ -217,9 +221,12 @@ def perform_inference():
 
     print("Running model")
     with tf.Session(graph=graph) as sess:
+        start_time = time.time()
         eval_batch_data = eval_data[0]
         eval_batch_label = eval_labels[0]
         YYY = sess.run(YYY, feed_dict={XXX: eval_batch_data})
+        elapsed_time = time.time() - start_time 
+        print("total time(s)", np.round(elapsed_time, 3))
 
     report_accuracy(YYY, eval_batch_label)
 
