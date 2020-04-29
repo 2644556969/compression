@@ -107,6 +107,59 @@ def load_mnist_logit_data(start_batch=0, batch_size=10000, y_train_logit_file='l
     return (x_train, y_train, y_train_label, x_test, y_test, y_test_label)
 
 
+def load_mnist_acc_data(start_batch=0, batch_size=10000, logit_scale=1):
+
+    y_train_logit_file='acc_train_logit_out.h5'
+    y_test_logit_file='acc_test_logit_out.h5'
+
+    x_train_image_file = 'acc_train_images.h5'
+    x_test_image_file = 'acc_test_images.h5'
+
+
+    mnist = tf.keras.datasets.mnist
+    (x_train, y_train_label), (x_test, y_test_label) = mnist.load_data()
+    y_train_label = tf.compat.v1.keras.utils.to_categorical(y_train_label, num_classes=10)
+    y_test_label = tf.compat.v1.keras.utils.to_categorical(y_test_label, num_classes=10)
+    x_train = np.expand_dims(x_train, axis=-1)
+    x_test = np.expand_dims(x_test, axis=-1)
+
+    #ADD option to take in x_train, x_test from a pre-processed augmented image dataset 
+
+    x_train = x_train.astype("float32")
+    x_test = x_test.astype("float32")
+    x_train /= 255.0
+    x_test /= 255.0
+
+    x_test = x_test[start_batch:start_batch + batch_size]
+    y_test_label = y_test_label[start_batch:start_batch + batch_size]
+    
+    #test training stuff 
+    f1 = h5py.File(x_train_image_file, 'r')
+    x_train = f1['dataset_1'][:]
+    f1.close() 
+
+    f2 = h5py.File(x_test_image_file, 'r')
+    x_test = f2['dataset_1'][:]
+    f2.close()
+    x_train = x_train /2 + .5 
+    x_test = x_test /2 + .5  
+
+    ##Adding logits from convolutional MNIST model  
+
+    h5f = h5py.File(y_train_logit_file , 'r')
+    y_train = h5f['dataset_1'][:]
+    h5f.close()
+
+    h5f2 = h5py.File(y_test_logit_file , 'r')
+    y_test = h5f2['dataset_1'][:]
+    h5f2.close()
+
+    y_train = y_train * logit_scale 
+    y_test = y_test * logit_scale
+
+    return (x_train, y_train, y_train_label, x_test, y_test, y_test_label)
+
+
 def load_pb_file(filename):
     """"Returns the graph_def from a saved protobuf file"""
     if not os.path.isfile(filename):
