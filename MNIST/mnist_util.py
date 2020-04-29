@@ -107,7 +107,7 @@ def load_mnist_logit_data(start_batch=0, batch_size=10000, y_train_logit_file='l
     return (x_train, y_train, y_train_label, x_test, y_test, y_test_label)
 
 
-def load_mnist_acc_data(start_batch=0, batch_size=10000, logit_scale=1):
+def load_mnist_logit_data_acc(start_batch=0, batch_size=10000, logit_scale=1.0):
 
     y_train_logit_file='acc_train_logit_out.h5'
     y_test_logit_file='acc_test_logit_out.h5'
@@ -154,8 +154,12 @@ def load_mnist_acc_data(start_batch=0, batch_size=10000, logit_scale=1):
     y_test = h5f2['dataset_1'][:]
     h5f2.close()
 
+    print("ok this better work", np.argmax(y_test[0:5], axis=1))
+
     y_train = y_train * logit_scale 
     y_test = y_test * logit_scale
+
+    print(np.argmax(y_test[0:5], axis=1))
 
     return (x_train, y_train, y_train_label, x_test, y_test, y_test_label)
 

@@ -345,7 +345,16 @@ def main(FLAGS):
     #architectures = generate_architecture(4096) TODO
     max_levels = 4
     input_size = 784
-    output_size = 10 
+    output_size = 10
+
+
+    print("TESTING A LOT OF SHIT")
+    print(x_train.shape, y_train.shape, y_train_label.shape, x_test.shape, y_test.shape, y_test_label.shape) 
+    print("img1", x_train[0])
+    print("log1", y_train[0])
+    print("label", y_train_label[0]) 
+
+    print(np.argmax(y_test[0:5], axis=1), np.argmax(y_test_label[0:5], axis=1))
 
     #architectures = generate_architectures(max_levels, input_size, output_size, include_bottleneck=True)
     architectures = [[("dense", 100), ("activation", "square"), ("dense", 10)]]
