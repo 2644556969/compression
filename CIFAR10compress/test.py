@@ -77,6 +77,8 @@ def server_config_from_flags(FLAGS, tensor_param_name):
     server_config.parameter_map["num_gc_threads"].s = (str(
         False)).encode()
 
+    print("backend:", FLAGS.backend, FLAGS.encryption_parameters, FLAGS.encrypt_server_data)
+
 
     if FLAGS.encrypt_server_data:
         server_config.parameter_map[tensor_param_name].s = b"encrypt"
@@ -263,6 +265,7 @@ def perform_inference():
     YYY = graph.get_tensor_by_name('YYY:0')
 
     print("GETTING CONFIGS")
+    print(XXX.name)
 
     config = server_config_from_flags(FLAGS, XXX.name)
 
