@@ -35,6 +35,7 @@ from tensorflow.python.tools import freeze_graph
 from tensorflow.python.platform import gfile
 
 from tensorflow.core.protobuf import rewriter_config_pb2
+import os.path
 
 
 import ngraph_bridge
@@ -77,7 +78,7 @@ def server_config_from_flags(FLAGS, tensor_param_name):
     server_config.parameter_map["num_gc_threads"].s = (str(
         False)).encode()
 
-    print("backend:", FLAGS.backend, FLAGS.encryption_parameters, FLAGS.encrypt_server_data)
+    print("backend:", FLAGS.backend, FLAGS.encryption_parameters, FLAGS.encrypt_serv)
 
 
     if FLAGS.encrypt_server_data:
