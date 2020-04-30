@@ -1,5 +1,5 @@
-This project applies model compression techniques to the MNIST and CIFAR-10 datasets using HE-transformer. 
+This project applies model compression techniques from  "Distilling the Knowledge in a Neural Network - Geoffery Hinton et. al" (https://arxiv.org/abs/1503.02531) and "Do Deep Nets Really Need to be Deep?" (https://arxiv.org/abs/1312.6184). 
 
-Code for base models is adapted from https://github.com/IntelAI/he-transformer
+It uses the HE transformer library from https://github.com/IntelAI/he-transformer. Running the code requires HE transformer to first be installed following the instructions from that repository, then running `source $HE_TRANSFORMER/build/external/venv-tf-py3/bin/activate` so that the python environment containing HE transformer nGraph tensorflow bridge is activated. 
 
-To run, requires he-transformer to be installed from that respository. 
+This project trains shallow models for MNIST in MNIST/Compressnets and CIFAR-10 in CIFAR10compress. Code for base models is adapted from https://github.com/IntelAI/he-transformer/tree/master/examples
