@@ -10,9 +10,13 @@ python Compressnets/train.py --epochs=20 --batch_size=128 --save_file=debug --lo
 ```
 
 --epochs : number of epochs to train 
+
 --batch_size: batch size 
+
 --save_file: filename to save the trained model to in "models/*.pb"
+
 --logit_scale: linearly scaling the logits for model compression 
+
 --genereate_architectures_depth: max multiplicative depth of architectures to generate (default -1 will not generate)
 
 Training logits can be modified by changing y_train_logits / y_test_logits in code. 
