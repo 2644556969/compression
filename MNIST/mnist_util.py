@@ -255,6 +255,8 @@ def train_argument_parser():
         "--save_file", type=str, default="default", help="filename to save the model to")
     parser.add_argument(
         "--logit_scale", type=float, default=1.0, help="how to scale logits")
+    parser.add_argument(
+        "--generate_architectures_depth", type=int, default=-1, help="whether to generate various shallow architectures")
     
     return parser
 

@@ -347,20 +347,16 @@ def main(FLAGS):
 
 
     #generate valid architectures for a given security level and fixed layer level:
-    #architectures = generate_architecture(4096) TODO
-    max_levels = 4
+    max_levels = 4 
+    max_levels = FLAGS.generate_architectures_depth 
     input_size = 784
     output_size = 10 
 
-    #architectures = generate_architectures(max_levels, input_size, output_size, include_bottleneck=True)
-    architectures = [[("dense", 100), ("activation", "square"), ("dense", 10)]]
+    if FLAGS.generate_architectures_depth > -1:
+            architectures = generate_architectures(max_levels, input_size, output_size, include_bottleneck=True)
+    else:
+        architectures = [[("dense", 400), ("activation", "square"), ("dense", 10)]]
 
-    #[]
-    # [("dense", 100), ("dense", 800), ("activation", "square"), ("dense", 10)], 
-    # [("dense", 800), ("dense", 800), ("activation", "square"), ("dense", 10)],
-    # [("dense", 800), ("dense", 800), ("dense", 10)]
-    # [("dense", 800), ("activation", "square"), ("dense", 10)],
-    # [("dense", 800), ("dense", 10), ("activation", "square")]]
     print("Architectures to test:")
     for i in range(len(architectures)):
         print(f"### ARCHITECTURE {i} ### ")
